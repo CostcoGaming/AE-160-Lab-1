@@ -8,13 +8,14 @@ def read_files(files):
 
     return new_files
 
-path = r"D:\School\'23 Fall\Lab\AE 160\Lab 1"
+# path = r"D:\School\'23 Fall\Lab\AE 160\Lab 1" # Desktop
+path = r"/Users/bruh/Documents/Codes/AE 160/Data" # Mac
 files = [
-    path+'\Flat Plate Angle.csv',
-    path+'\Flat Plate Velocity.csv',
-    path+'\Half Sphere.csv',
-    path+'\Inverted Cup.csv',
-    path+'\Sphere.csv'
+    path+'/Flat Plate Angle.csv',
+    path+'/Flat Plate Velocity.csv',
+    path+'/Half Sphere.csv',
+    path+'/Inverted Cup.csv',
+    path+'/Sphere.csv'
 ]
 
 data = read_files(files)
@@ -46,6 +47,13 @@ halfSphereData = [
     halfSphere['PM/YM']*0.1129848333     # Pitching Moment in N*m
 ]
 
+invertedCupData = [
+    invertedCup['V_ref']/2.237,          # Velocity in m/s
+    invertedCup['NF/SF']*4.44822,        # Normal Force in N
+    invertedCup['AF/AF2']*4.44822,       # Axial Force in N
+    invertedCup['PM/YM']*0.1129848333,   # Pitching Moment in N*m
+]
+
 sphereData = [
     sphere['V_ref']/2.237,               # Velocity in m/s
     sphere['NF/SF']*4.44822,             # Normal Force in N
@@ -54,30 +62,93 @@ sphereData = [
 ]
 
 # Set up window
-fig, ax = plt.subplots()
+fig1, ax1 = plt.subplots()
+fig2, ax2 = plt.subplots()
+fig3, ax3 = plt.subplots()
 
-# Axial Force
-ax.set_xlabel('V_inf [m/s]')
-ax.set_ylabel('Axial Force [N]')
-ax.plot(
+# Normal Force v Velocity
+ax1.set_xlabel('V_inf [m/s]')
+ax1.set_ylabel('Normal Forcce [N]')
+ax1.plot(
+    flatPlateVelData[0],
+    flatPlateVelData[1],
+    'r-',
+    label='Flat Plate',
+    zorder=10
+)
+ax1.plot(
+    halfSphereData[0],    
+    halfSphereData[1],
+    'b-',
+    label='Half Sphere',
+    zorder=15 
+)
+ax1.plot(
+    invertedCupData[0],
+    invertedCupData[1],
+    'k-',
+    label='Inverted Cup',
+    zorder=5
+)
+ax1.plot(
+    sphereData[0],
+    sphereData[1],
+    'g-',
+    label='Sphere',
+    zorder=0
+)
+
+# Axial Force v Velocity
+ax2.set_xlabel('V_inf [m/s]')
+ax2.set_ylabel('Axial Force [N]')
+ax2.plot(
     flatPlateVelData[0],
     flatPlateVelData[2],
     'r-',
     label='Flat Plate'
 )
-ax.plot(
+ax2.plot(
     halfSphereData[0],
     halfSphereData[2],
     'b-',
     label='Half Sphere'
 )
-ax.plot(
+ax2.plot(
+    invertedCupData[0],
+    invertedCupData[2],
+    'k-',
+    label='Inverted Cup'
+)
+ax2.plot(
     sphereData[0],
     sphereData[2],
     'g-',
     label='Sphere'
 )
 
-plt.suptitle('Axial Force vs Free Stream Velocity')
-plt.legend()
+# Normal/Axial Force v Angle of Attack
+ax3.set_xlabel('Alpha [deg]')
+ax3.set_ylabel('Force [N]')
+ax3.plot(
+    flatPlateAngData[0],
+    flatPlateAngData[1],
+    'r-',
+    label='Normal Force'
+)
+ax3.plot(
+    flatPlateAngData[0],
+    flatPlateAngData[2],
+    'b-',
+    label='Axial Force'
+)
+
+ax1.set_title('Normal Force vs Free Stream Velocity')
+ax1.set_xlim(xmin=0)
+ax1.legend()
+ax2.set_title('Axial Force vs Free Stream Velocity')
+ax2.set_xlim(xmin=0)
+ax2.legend()
+ax3.set_title('Normal/Axial Force vs Angle of Attack')
+ax3.set_xlim(xmin=0)
+ax3.legend()
 plt.show()
