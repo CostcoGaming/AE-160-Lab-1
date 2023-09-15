@@ -1,3 +1,4 @@
+import math
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -8,16 +9,28 @@ def read_files(files):
 
     return new_files
 
-# path = r"D:\School\'23 Fall\Lab\AE 160\Lab 1" # Desktop
-path = r"/Users/bruh/Documents/Codes/AE 160/Data" # Mac
+def q2v(q, T, p):
+    # This functions takes dynamic pressure, temperature, and pressure and 
+    # converts it into wind speed.
+    R = 287 # J*kg^-1*K^-1
+    vel = [0]*len(q)
+    for i in range(0,len(q)):
+        vel[i] = math.sqrt((2*q[i]*R*T)/p)
+    
+    return vel
+
+path = r"D:\School\'23 Fall\Lab\AE 160\Lab 1" # Desktop
+# path = r"/Users/bruh/Documents/Codes/AE 160/Data" # Mac
 files = [
-    path+'/Flat Plate Angle.csv',
-    path+'/Flat Plate Velocity.csv',
-    path+'/Half Sphere.csv',
-    path+'/Inverted Cup.csv',
-    path+'/Sphere.csv'
+    path+'\Flat Plate Angle.csv',
+    path+'\Flat Plate Velocity.csv',
+    path+'\Half Sphere.csv',
+    path+'\Inverted Cup.csv',
+    path+'\Sphere.csv'
 ]
 
+temp = 296.15 # K (Found from National Weather Service website)
+pressure = 100914 # Pa (Also found from NWS site)
 data = read_files(files)
 
 flatPlateAng = data[0]
@@ -34,31 +47,31 @@ flatPlateAngData = [
 ]
 
 flatPlateVelData = [
-    flatPlateVel['V_ref']/2.237,         # Velocity in m/s
-    flatPlateVel['NF/SF']*4.44822,       # Normal Force in N
-    flatPlateVel['AF/AF2']*4.44822,      # Axial Force in N
-    flatPlateVel['PM/YM']*0.1129848333,  # Pitching Moment in N*m
+    q2v(abs(flatPlateVel['q'])/0.020885, temp, pressure), # Velocity in m/s
+    flatPlateVel['NF/SF']*4.44822,                        # Normal Force in N
+    flatPlateVel['AF/AF2']*4.44822,                       # Axial Force in N
+    flatPlateVel['PM/YM']*0.1129848333,                   # Pitching Moment in N*m
 ]
 
 halfSphereData = [
-    halfSphere['V_ref']/2.237,           # Velocity in m/s
-    halfSphere['NF/SF']*4.44822,         # Normal Force in N
-    halfSphere['AF/AF2']*4.44822,        # Axial Force in N
-    halfSphere['PM/YM']*0.1129848333     # Pitching Moment in N*m
+    q2v(abs(halfSphere['q'])/0.020885, temp, pressure), # Velocity in m/s
+    halfSphere['NF/SF']*4.44822,                        # Normal Force in N
+    halfSphere['AF/AF2']*4.44822,                       # Axial Force in N
+    halfSphere['PM/YM']*0.1129848333                    # Pitching Moment in N*m
 ]
 
 invertedCupData = [
-    invertedCup['V_ref']/2.237,          # Velocity in m/s
-    invertedCup['NF/SF']*4.44822,        # Normal Force in N
-    invertedCup['AF/AF2']*4.44822,       # Axial Force in N
-    invertedCup['PM/YM']*0.1129848333,   # Pitching Moment in N*m
+    q2v(abs(invertedCup['q'])/0.020885, temp, pressure), # Velocity in m/s
+    invertedCup['NF/SF']*4.44822,                        # Normal Force in N
+    invertedCup['AF/AF2']*4.44822,                       # Axial Force in N
+    invertedCup['PM/YM']*0.1129848333,                   # Pitching Moment in N*m
 ]
 
 sphereData = [
-    sphere['V_ref']/2.237,               # Velocity in m/s
-    sphere['NF/SF']*4.44822,             # Normal Force in N
-    sphere['AF/AF2']*4.44822,            # Axial Force in N
-    sphere['PM/YM']*0.1129848333         # Pitching Moment in N*m
+    q2v(abs(sphere['q'])/0.020885, temp, pressure), # Velocity in m/s
+    sphere['NF/SF']*4.44822,                        # Normal Force in N
+    sphere['AF/AF2']*4.44822,                       # Axial Force in N
+    sphere['PM/YM']*0.1129848333                    # Pitching Moment in N*m
 ]
 
 # Set up window
@@ -105,25 +118,29 @@ ax2.plot(
     flatPlateVelData[0],
     flatPlateVelData[2],
     'r-',
-    label='Flat Plate'
+    label='Flat Plate',
+    zorder=2
 )
 ax2.plot(
     halfSphereData[0],
     halfSphereData[2],
     'b-',
-    label='Half Sphere'
+    label='Half Sphere',
+    zorder=5
 )
 ax2.plot(
     invertedCupData[0],
     invertedCupData[2],
     'k-',
-    label='Inverted Cup'
+    label='Inverted Cup',
+    zorder=10
 )
 ax2.plot(
     sphereData[0],
     sphereData[2],
     'g-',
-    label='Sphere'
+    label='Sphere',
+    zorder=0
 )
 
 # Normal/Axial Force v Angle of Attack
