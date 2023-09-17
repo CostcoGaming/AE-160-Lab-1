@@ -157,6 +157,7 @@ ax4.plot(
     label='Axial Force'
 )
 
+# Graph formating
 ax1.set_title('Normal Force vs Free Stream Velocity')
 ax1.set_xlim(xmin=0)
 ax1.legend()
