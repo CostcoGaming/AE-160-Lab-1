@@ -4,6 +4,13 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 from scipy.signal import savgol_filter as sf
 
+class Data:
+    def __init__(self, alphaVel, normalForce, axialForce, pitchingMoment):
+        self.X = alphaVel
+        self.NF = normalForce
+        self.AF = axialForce
+        self.PM = pitchingMoment
+
 def read_files(files):
     new_files = [0]*len(files)
     rows = [0,1,2,3,4,5,6,8]
@@ -12,15 +19,40 @@ def read_files(files):
 
     return new_files
 
-def q2v(q, T, p):
+def q2v(q):
     # This functions takes dynamic pressure, temperature, and pressure and 
     # converts it into wind speed.
-    R = 287 # J*kg^-1*K^-1
+    T = 296.15 # K (Found from National Weather Service website)
+    p = 100914 # Pa (Also found from NWS site)
+    R = 287    # J*kg^-1*K^-1
     vel = [0]*len(q)
     for i in range(0,len(q)):
-        vel[i] = math.sqrt((2*q[i]*R*T)/p)
+        vel[i] = math.sqrt((2*abs(q)[i]*R*T)/p)
     
     return vel
+
+def datasplit(data):
+    n = 5
+    lbf2N = 4.44822         # Conversion for lbf to N
+    inlbs2Nm = 0.1129848333 # Conversion for in*lbf to N*m
+    
+    list = [0]*n
+    list[0] = Data(
+        data[0]['Alpha'],
+        data[0]['NF/SF']*lbf2N,
+        data[0]['AF/AF2']*lbf2N,
+        data[0]['PM/YM']*inlbs2Nm
+    )
+    
+    for i in range(1,n):
+        list[i] = Data(
+            q2v(data[i]['q']),
+            data[i]['NF/SF']*lbf2N,
+            data[i]['AF/AF2']*lbf2N,
+            data[i]['PM/YM']*inlbs2Nm
+        )   
+
+    return list
 
 path = str(Path(__file__).parent)+'/Data'
 files = [
@@ -31,50 +63,9 @@ files = [
     path+'/Sphere.csv'
 ]
 
-temp = 296.15 # K (Found from National Weather Service website)
-pressure = 100914 # Pa (Also found from NWS site)
 data = read_files(files)
 
-flatPlateAng = data[0]
-flatPlateVel = data[1]
-halfSphere = data[2]
-invertedCup = data[3]
-sphere = data[4]
-
-flatPlateAngData = [
-    flatPlateAng['Alpha'],               # Angle of Attack in deg
-    flatPlateAng['NF/SF']*4.44822,       # Normal Force in N
-    flatPlateAng['AF/AF2']*4.44822,      # Axial Force in N
-    flatPlateAng['PM/YM']*0.1129848333   # Pitching Moment in N*m
-]
-
-flatPlateVelData = [
-    q2v(abs(flatPlateVel['q'])/0.020885, temp, pressure), # Velocity in m/s
-    flatPlateVel['NF/SF']*4.44822,                        # Normal Force in N
-    flatPlateVel['AF/AF2']*4.44822,                       # Axial Force in N
-    flatPlateVel['PM/YM']*0.1129848333,                   # Pitching Moment in N*m
-]
-
-halfSphereData = [
-    q2v(abs(halfSphere['q'])/0.020885, temp, pressure), # Velocity in m/s
-    halfSphere['NF/SF']*4.44822,                        # Normal Force in N
-    halfSphere['AF/AF2']*4.44822,                       # Axial Force in N
-    halfSphere['PM/YM']*0.1129848333                    # Pitching Moment in N*m
-]
-
-invertedCupData = [
-    q2v(abs(invertedCup['q'])/0.020885, temp, pressure), # Velocity in m/s
-    invertedCup['NF/SF']*4.44822,                        # Normal Force in N
-    invertedCup['AF/AF2']*4.44822,                       # Axial Force in N
-    invertedCup['PM/YM']*0.1129848333,                   # Pitching Moment in N*m
-]
-
-sphereData = [
-    q2v(abs(sphere['q'])/0.020885, temp, pressure), # Velocity in m/s
-    sphere['NF/SF']*4.44822,                        # Normal Force in N
-    sphere['AF/AF2']*4.44822,                       # Axial Force in N
-    sphere['PM/YM']*0.1129848333                    # Pitching Moment in N*m
-]
+flatPlateAng, flatPlateVel, halfSphere, invertedCup, sphere = datasplit(data)
 
 # Set up window
 fig1, ax1 = plt.subplots()
@@ -86,31 +77,31 @@ po = 2
 
 # Normal Force v Velocity
 ax1.set_xlabel('V_inf [m/s]')
-ax1.set_ylabel('Normal Forcce [N]')
+ax1.set_ylabel('Normal Force [N]')
 ax1.plot(
-    sf(flatPlateVelData[0], wl, po),
-    sf(abs(flatPlateVelData[1]), wl, po),
+    sf(flatPlateVel.X, wl, po),
+    sf(abs(flatPlateVel.NF), wl, po),
     'r-',
     label='Flat Plate',
     zorder=10
 )
 ax1.plot(
-    sf(halfSphereData[0], wl, po),    
-    sf(abs(halfSphereData[1]), wl, po),
+    sf(halfSphere.X, wl, po),    
+    sf(abs(halfSphere.NF), wl, po),
     'b-',
     label='Half Sphere',
     zorder=15 
 )
 ax1.plot(
-    sf(invertedCupData[0], wl, po),
-    sf(abs(invertedCupData[1]), wl, po),
+    sf(invertedCup.X, wl, po),
+    sf(abs(invertedCup.NF), wl, po),
     'k-',
     label='Inverted Cup',
     zorder=5
 )
 ax1.plot(
-    sf(sphereData[0], wl, po),
-    sf(abs(sphereData[1]), wl, po),
+    sf(sphere.X, wl, po),
+    sf(abs(sphere.NF), wl, po),
     'g-',
     label='Sphere',
     zorder=0
@@ -120,29 +111,29 @@ ax1.plot(
 ax2.set_xlabel('V_inf [m/s]')
 ax2.set_ylabel('Axial Force [N]')
 ax2.plot(
-    sf(flatPlateVelData[0], wl, po),
-    sf(flatPlateVelData[2], wl, po),
+    sf(flatPlateVel.X, wl, po),
+    sf(flatPlateVel.AF, wl, po),
     'r-',
     label='Flat Plate',
     zorder=2
 )
 ax2.plot(
-    sf(halfSphereData[0], wl, po),
-    sf(halfSphereData[2], wl, po),
+    sf(halfSphere.X, wl, po),
+    sf(halfSphere.AF, wl, po),
     'b-',
     label='Half Sphere',
     zorder=5
 )
 ax2.plot(
-    sf(invertedCupData[0], wl, po),
-    sf(invertedCupData[2], wl, po),
+    sf(invertedCup.X, wl, po),
+    sf(invertedCup.AF, wl, po),
     'k-',
     label='Inverted Cup',
     zorder=10
 )
 ax2.plot(
-    sf(sphereData[0], wl, po),
-    sf(sphereData[2], wl, po),
+    sf(sphere.X, wl, po),
+    sf(sphere.AF, wl, po),
     'g-',
     label='Sphere',
     zorder=0
@@ -152,16 +143,16 @@ ax2.plot(
 ax3.set_xlabel('Alpha [deg]')
 ax3.set_ylabel('Normal Force [N]')
 ax3.plot(
-    sf(flatPlateAngData[0], wl, po),
-    sf(abs(flatPlateAngData[1]), wl, po),
+    sf(flatPlateAng.X, wl, po),
+    sf(abs(flatPlateAng.NF), wl, po),
     'r-',
     label='Normal Force'
 )
 ax4.set_xlabel('Alpha [deg]')
 ax4.set_ylabel('Axial Force [N]')
 ax4.plot(
-    sf(flatPlateAngData[0], wl, po),
-    sf(flatPlateAngData[2], wl, po),
+    sf(flatPlateAng.X, wl, po),
+    sf(flatPlateAng.AF, wl, po),
     'b-',
     label='Axial Force'
 )
