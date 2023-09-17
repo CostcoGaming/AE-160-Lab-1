@@ -11,27 +11,31 @@ class Data:
         self.AF = axialForce
         self.PM = pitchingMoment
 
-def read_files(files):
+def read_files(files: list[str]):
+    '''This function reads .csv a list of files and turns it into a list of 
+    pandas dataframes'''
     new_files = [0]*len(files)
-    rows = [0,1,2,3,4,5,6,8]
+    rows = [0,1,2,3,4,5,6,8] # Skips these rows when reading csv files
     for i in range(0,len(files)):
         new_files[i] = pd.read_csv(files[i], skiprows=rows)
 
     return new_files
 
-def q2v(q):
-    # This functions takes dynamic pressure, temperature, and pressure and 
-    # converts it into wind speed.
+def q2v(q: list):
+    '''This function uses the ideal gas law and the dynamic pressure equation
+    in order to convert dynamic pressure into wind velocity'''
     T = 296.15 # K (Found from National Weather Service website)
     p = 100914 # Pa (Also found from NWS site)
     R = 287    # J*kg^-1*K^-1
     vel = [0]*len(q)
     for i in range(0,len(q)):
-        vel[i] = math.sqrt((2*abs(q)[i]*R*T)/p)
+        vel[i] = math.sqrt((2*abs(q[i])*R*T)/p)
     
     return vel
 
-def datasplit(data):
+def datasplit(data: list):
+    '''This function splits dataframe into: Alpha/Velocity, Normal Force,
+    Axial Force, and Pitching Moment. Also converts forces into metric.'''
     n = 5
     lbf2N = 4.44822         # Conversion for lbf to N
     inlbs2Nm = 0.1129848333 # Conversion for in*lbf to N*m
@@ -54,7 +58,8 @@ def datasplit(data):
 
     return list
 
-path = str(Path(__file__).parent)+'/Data'
+# File reading
+path = str(Path(__file__).parent)+'/Data' # Finds current path and Data folder
 files = [
     path+'/Flat Plate Angle.csv',
     path+'/Flat Plate Velocity.csv',
@@ -72,8 +77,9 @@ fig1, ax1 = plt.subplots()
 fig2, ax2 = plt.subplots()
 fig3, [ax3, ax4] = plt.subplots(2)
 
-wl = 151
-po = 2
+# Savitsky-Golay filter coefficients
+wl = 151 # Window Length
+po = 2   # Polynomial Order
 
 # Normal Force v Velocity
 ax1.set_xlabel('V_inf [m/s]')
