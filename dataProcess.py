@@ -86,28 +86,28 @@ ax1.set_xlabel('V_inf [m/s]')
 ax1.set_ylabel('Normal Force [N]')
 ax1.plot(
     sf(flatPlateVel.X, wl, po),
-    sf(abs(flatPlateVel.NF), wl, po),
+    flatPlateVel.NF,
     'r-',
     label='Flat Plate',
     zorder=10
 )
 ax1.plot(
     sf(halfSphere.X, wl, po),    
-    sf(abs(halfSphere.NF), wl, po),
+    halfSphere.NF,
     'b-',
     label='Half Sphere',
     zorder=15 
 )
 ax1.plot(
     sf(invertedCup.X, wl, po),
-    sf(abs(invertedCup.NF), wl, po),
+    invertedCup.NF,
     'k-',
     label='Inverted Cup',
     zorder=5
 )
 ax1.plot(
     sf(sphere.X, wl, po),
-    sf(abs(sphere.NF), wl, po),
+    sphere.NF,
     'g-',
     label='Sphere',
     zorder=0
