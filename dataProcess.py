@@ -4,16 +4,27 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 from scipy.signal import savgol_filter as sf
 
+# Create global variables
+global T, p, R, psf2pa
+T = 296.15        # K (Found from National Weather Service website)
+p = 100914        # Pa (Also found from NWS site)
+R = 287           # J*kg^-1*K^-1 (Specific gas constant for air)
+psf2pa = 0.020885 # Converts psf into Pa
+
 class Data:
-    def __init__(self, alphaVel, normalForce, axialForce, pitchingMoment):
+    def __init__(self, alphaVel, normalForce, axialForce, pitchingMoment,
+                 coefficientLift, coefficientDrag):
         self.X = alphaVel
         self.NF = normalForce
         self.AF = axialForce
         self.PM = pitchingMoment
+        self.CL = coefficientLift
+        self.CD = coefficientDrag
 
 def read_files(files: list[str]):
     '''This function reads .csv a list of files and turns it into a list of 
     pandas dataframes'''
+    
     new_files = [0]*len(files)
     rows = [0,1,2,3,4,5,6,8] # Skips these rows when reading csv files
     for i in range(0,len(files)):
@@ -24,36 +35,73 @@ def read_files(files: list[str]):
 def q2v(q: list):
     '''This function uses the ideal gas law and the dynamic pressure equation
     in order to convert dynamic pressure into wind velocity'''
-    T = 296.15 # K (Found from National Weather Service website)
-    p = 100914 # Pa (Also found from NWS site)
-    R = 287    # J*kg^-1*K^-1
+    
     vel = [0]*len(q)
     for i in range(0,len(q)):
-        vel[i] = math.sqrt((2*abs(q[i])*R*T)/p)
+        vel[i] = math.sqrt((2*abs(q[i]/psf2pa)*R*T)/p)
     
     return vel
+
+def force2coeff(force: list, q: list):
+    '''This function converts force into coefficients (i.e, lift force --> 
+    coefficient of lift)'''
+    n = len(force)
+    S = 0.01 # m (Length of object)
+    
+    coefficient = [0]*n
+    for i in range(0,n):
+        if q[i] == 0: # Skips when q = 0, so as not to divide by 0.
+            coefficient[i] = None
+        else:
+            coefficient[i] = force[i]/(q[i]*S)
+        
+    return coefficient
+
+def NA2LD(N:list, A:list, alphaDeg: list):
+    '''This function takes normal/axial force and angle of attack and converts
+    it into lift/drag force'''
+    
+    n = len(N)
+    liftForce = [0]*n
+    dragForce = liftForce
+    alphaRad = liftForce
+    for i in range(0,n):
+        alphaRad[i] = math.radians(alphaDeg[i]) # Convert AoA into radians
+        liftForce[i] = N[i]*math.cos(alphaRad[i]) - A[i]*math.sin(alphaRad[i])
+        dragForce[i] = N[i]*math.sin(alphaRad[i]) + A[i]*math.cos(alphaRad[i])
+
+    return liftForce, dragForce
 
 def datasplit(data: list):
     '''This function splits dataframe into: Alpha/Velocity, Normal Force,
     Axial Force, and Pitching Moment. Also converts forces into metric.'''
-    n = 5
+    
     lbf2N = 4.44822         # Conversion for lbf to N
     inlbs2Nm = 0.1129848333 # Conversion for in*lbf to N*m
+    n = len(data)
+    
+    lF, dF = NA2LD(data[0]['NF/SF']*lbf2N, data[0]['AF/AF2']*lbf2N,
+                   data[0]['Alpha'])
     
     list = [0]*n
     list[0] = Data(
         data[0]['Alpha'],
         data[0]['NF/SF']*lbf2N,
         data[0]['AF/AF2']*lbf2N,
-        data[0]['PM/YM']*inlbs2Nm
+        data[0]['PM/YM']*inlbs2Nm,
+        force2coeff(lF, data[0]['q']/psf2pa),
+        force2coeff(dF, data[0]['q']/psf2pa)
+        
     )
     
     for i in range(1,n):
-        list[i] = Data(
+        list[i] = Data( # Assume NF/AF == LF/DF since AoA = 0
             q2v(data[i]['q']),
             data[i]['NF/SF']*lbf2N,
             data[i]['AF/AF2']*lbf2N,
-            data[i]['PM/YM']*inlbs2Nm
+            data[i]['PM/YM']*inlbs2Nm,
+            force2coeff(data[i]['NF/SF']*lbf2N, data[i]['q']/psf2pa),
+            force2coeff(data[i]['AF/AF2']*lbf2N, data[i]['q']/psf2pa)
         )   
 
     return list
@@ -75,7 +123,8 @@ flatPlateAng, flatPlateVel, halfSphere, invertedCup, sphere = datasplit(data)
 # Set up window
 fig1, ax1 = plt.subplots()
 fig2, ax2 = plt.subplots()
-fig3, [ax3, ax4] = plt.subplots(2)
+fig3, [ax3, ax3_2] = plt.subplots(2)
+fig4, [ax4, ax4_2] = plt.subplots(2)
 
 # Savitsky-Golay filter coefficients
 wl = 151 # Window Length
@@ -154,13 +203,30 @@ ax3.plot(
     'r-',
     label='Normal Force'
 )
-ax4.set_xlabel('Alpha [deg]')
-ax4.set_ylabel('Axial Force [N]')
-ax4.plot(
+ax3_2.set_xlabel('Alpha [deg]')
+ax3_2.set_ylabel('Axial Force [N]')
+ax3_2.plot(
     sf(flatPlateAng.X, wl, po),
     sf(flatPlateAng.AF, wl, po),
     'b-',
     label='Axial Force'
+)
+
+ax4.set_xlabel('Alpha [deg]')
+ax4.set_ylabel('Lift Coefficient')
+ax4.plot(
+    sf(flatPlateAng.X, wl, po),
+    sf(flatPlateAng.CL, wl, 1),
+    'r-',
+    label='Coefficient of Lift'
+)
+ax4_2.set_xlabel('Alpha [deg]')
+ax4_2.set_ylabel('Drag Coefficient')
+ax4_2.plot(
+    sf(flatPlateAng.X, wl, po),
+    sf(flatPlateAng.CD, wl, 1),
+    'b-',
+    label='Coefficient of Drag'
 )
 
 # Graph formating
@@ -172,4 +238,8 @@ ax2.set_xlim(xmin=0)
 ax2.legend()
 ax3.set_title('Normal/Axial Force vs Angle of Attack')
 ax3.set_xlim(xmin=0)
+ax3_2.set_xlim(xmin=0)
+ax4.set_title('Coefficient of Lift vs Angle of Attack')
+ax4.set_xlim(xmin=0)
+ax4_2.set_xlim(xmin=0)
 plt.show()
