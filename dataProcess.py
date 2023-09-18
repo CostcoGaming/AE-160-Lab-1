@@ -5,10 +5,7 @@ from pathlib import Path
 from scipy.signal import savgol_filter as sf
 
 # Create global variables
-global T, p, R, psf2pa
-T = 296.15        # K (Found from National Weather Service website)
-p = 100914        # Pa (Also found from NWS site)
-R = 287           # J*kg^-1*K^-1 (Specific gas constant for air)
+global psf2pa
 psf2pa = 0.020885 # Converts psf into Pa
 
 class Data:
@@ -35,6 +32,9 @@ def read_files(files: list[str]):
 def q2v(q: list):
     '''This function uses the ideal gas law and the dynamic pressure equation
     in order to convert dynamic pressure into wind velocity'''
+    T = 296.15        # K (Found from National Weather Service website)
+    p = 100914        # Pa (Also found from NWS site)
+    R = 287           # J*kg^-1*K^-1 (Specific gas constant for air)
     
     vel = [0]*len(q)
     for i in range(0,len(q)):
