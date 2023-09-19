@@ -198,21 +198,21 @@ ax2.plot(
     sf(flatPlateVel.AF, wl, po),
     'r-',
     label='Flat Plate',
-    zorder=2
+    zorder=5
 )
 ax2.plot(
     sf(halfSphere.X, wl, po),
     sf(halfSphere.AF, wl, po),
     'b-',
     label='Half Sphere',
-    zorder=5
+    zorder=10
 )
 ax2.plot(
     sf(invertedCup.X, wl, po),
     sf(invertedCup.AF, wl, po),
     'k-',
     label='Inverted Cup',
-    zorder=10
+    zorder=15
 )
 ax2.plot(
     sf(sphere.X, wl, po),
