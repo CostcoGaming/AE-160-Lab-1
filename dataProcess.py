@@ -6,7 +6,7 @@ from scipy.signal import savgol_filter as sf
 
 # Create global variables
 global psf2pa
-psf2pa = 0.020885 # Converts psf into Pa
+psf2pa = 0.020885 # Conversion factor for psf --> Pa
 
 class Data:
     def __init__(self, alphaVel, normalForce, axialForce, pitchingMoment,
@@ -22,9 +22,12 @@ def read_files(files: list[str]):
     '''This function reads .csv a list of files and turns it into a list of 
     pandas dataframes'''
     
-    new_files = [0]*len(files)
+    n = len(files)
+    new_files = [0]*n
     rows = [0,1,2,3,4,5,6,8] # Skips these rows when reading csv files
-    for i in range(0,len(files)):
+
+    # Iterate through list of strings to read .csv files
+    for i in range(0,n):
         new_files[i] = pd.read_csv(files[i], skiprows=rows)
 
     return new_files
@@ -49,6 +52,8 @@ def force2coeff(force: list, q: list):
     S = 0.01 # m (Length of object)
     
     coefficient = [0]*n
+
+    # Iterate through force & q in order to find coefficients.
     for i in range(0,n):
         if q[i] == 0: # Skips when q = 0, so as not to divide by 0.
             coefficient[i] = None
@@ -62,9 +67,14 @@ def NA2LD(N:list, A:list, alphaDeg: list):
     it into lift/drag force'''
     
     n = len(N)
+
+    # Initialize lists
     liftForce = [0]*n
     dragForce = liftForce
     alphaRad = liftForce
+
+    # Iterate through list to convert to lift force for corresponding
+    # normal/axial forces + AoA.
     for i in range(0,n):
         alphaRad[i] = math.radians(alphaDeg[i]) # Convert AoA into radians
         liftForce[i] = N[i]*math.cos(alphaRad[i]) - A[i]*math.sin(alphaRad[i])
@@ -79,9 +89,14 @@ def datasplit(data: list):
     lbf2N = 4.44822         # Conversion for lbf to N
     inlbs2Nm = 0.1129848333 # Conversion for in*lbf to N*m
     n = len(data)
-    
+
+    # Find lifting force and drag force based on AoA and normal/axial forces.
+
     lF, dF = NA2LD(data[0]['NF/SF']*lbf2N, data[0]['AF/AF2']*lbf2N,
                    data[0]['Alpha'])
+    
+    # Separate Flat Plate Angle from other data, since x axis will be AoA
+    # rather than wind velocity.
     
     list = [0]*n
     list[0] = Data(
@@ -94,19 +109,25 @@ def datasplit(data: list):
         
     )
     
+    # Iterate through data to split for each shape and assign different types of
+    # data to object properties.
     for i in range(1,n):
         list[i] = Data( # Assume NF/AF == LF/DF since AoA = 0
-            q2v(data[i]['q']),
-            data[i]['NF/SF']*lbf2N,
-            data[i]['AF/AF2']*lbf2N,
-            data[i]['PM/YM']*inlbs2Nm,
+            q2v(data[i]['q']),         # convert 'q' column into v_inf
+            data[i]['NF/SF']*lbf2N,    # Normal Force
+            data[i]['AF/AF2']*lbf2N,   # Axial Force
+            data[i]['PM/YM']*inlbs2Nm, # Pitching Moment
             force2coeff(data[i]['NF/SF']*lbf2N, data[i]['q']/psf2pa),
             force2coeff(data[i]['AF/AF2']*lbf2N, data[i]['q']/psf2pa)
         )   
 
     return list
 
-# File reading
+# ------------------------------------------------------------------------------
+# ---------------------------------Main Program---------------------------------
+# ------------------------------------------------------------------------------
+
+# Read Files
 path = str(Path(__file__).parent)+'/Data' # Finds current path and Data folder
 files = [
     path+'/Flat Plate Angle.csv',
@@ -121,10 +142,10 @@ data = read_files(files)
 flatPlateAng, flatPlateVel, halfSphere, invertedCup, sphere = datasplit(data)
 
 # Set up window
-fig1, ax1 = plt.subplots()
-fig2, ax2 = plt.subplots()
-fig3, [ax3, ax3_2] = plt.subplots(2)
-fig4, [ax4, ax4_2] = plt.subplots(2)
+fig1, ax1 = plt.subplots() # Normal Force v Velocity
+fig2, ax2 = plt.subplots() # Axial Force v Velocity
+fig3, [ax3, ax3_2] = plt.subplots(2) # Normal/Axial Force v Angle of Attack
+fig4, [ax4, ax4_2] = plt.subplots(2) # Coefficient of Lift/Drag
 
 # Savitsky-Golay filter coefficients
 wl = 151 # Window Length
