@@ -8,10 +8,16 @@ from scipy.signal import savgol_filter as sf
 global psf2pa
 psf2pa = 0.020885 # Conversion factor for psf --> Pa
 
+# ------------------------------------------------------------------------------
+# ---------------------------- Classes & Functions -----------------------------
+# ------------------------------------------------------------------------------
+
+# Create object in order to call specific property of data rather than use messy
+# and confusing list formatting
 class Data:
     def __init__(self, alphaVel, normalForce, axialForce, pitchingMoment,
                  coefficientLift, coefficientDrag):
-        self.X = alphaVel
+        self.X = alphaVel # Either AoA or v_inf
         self.NF = normalForce
         self.AF = axialForce
         self.PM = pitchingMoment
@@ -41,6 +47,7 @@ def q2v(q: list):
     
     vel = [0]*len(q)
     for i in range(0,len(q)):
+        # use absolute value of q so as not to get a domain error w/ sqrt
         vel[i] = math.sqrt((2*abs(q[i]/psf2pa)*R*T)/p)
     
     return vel
@@ -51,7 +58,7 @@ def force2coeff(force: list, q: list):
     n = len(force)
     S = 0.01 # m (Length of object)
     
-    coefficient = [0]*n
+    coefficient = [0]*n # Initialize list
 
     # Iterate through force & q in order to find coefficients.
     for i in range(0,n):
@@ -91,7 +98,7 @@ def datasplit(data: list):
     n = len(data)
 
     # Find lifting force and drag force based on AoA and normal/axial forces.
-
+    # Only for flat plate angle
     lF, dF = NA2LD(data[0]['NF/SF']*lbf2N, data[0]['AF/AF2']*lbf2N,
                    data[0]['Alpha'])
     
