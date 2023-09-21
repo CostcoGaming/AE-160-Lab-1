@@ -226,16 +226,16 @@ ax2.plot(
 ax3.set_xlabel('Alpha [deg]')
 ax3.set_ylabel('Normal Force [N]')
 ax3.plot(
-    sf(flatPlateAng.X, wl, po),
-    sf(abs(flatPlateAng.NF), wl, po),
+    flatPlateAng.X,
+    flatPlateAng.NF,
     'r-',
     label='Normal Force'
 )
 ax3_2.set_xlabel('Alpha [deg]')
 ax3_2.set_ylabel('Axial Force [N]')
 ax3_2.plot(
-    sf(flatPlateAng.X, wl, po),
-    sf(flatPlateAng.AF, wl, po),
+    flatPlateAng.X,
+    flatPlateAng.AF,
     'b-',
     label='Axial Force'
 )
