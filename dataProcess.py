@@ -89,10 +89,39 @@ def NA2LD(N:list, A:list, alphaDeg: list):
 
     return liftForce, dragForce
 
+def momentTransfer(moment, normal, b):
+    A = 28.829/1000 # m
+    D = 71.04/1000 # m
+    n = len(moment)
+    C = D-(b/1000)    
+
+    new_moment = [0]*n
+    
+    for i in range(0,n):
+        new_moment[i] = moment[i] - (A + C)*normal[i]
+        
+    return new_moment
+
 def datasplit(data: list):
     '''This function splits dataframe into: Alpha/Velocity, Normal Force,
     Axial Force, and Pitching Moment. Also converts forces into metric.'''
     
+    diameters = [
+        74.82, # Flat Plate
+        74.82, # Flat Plate
+        75.48, # Half Sphere
+        75.40, # Inverted Cup
+        76.21  # Sphere
+    ]
+
+    B = [
+        98.42,  # Flat Plate
+        98.42,  # Flat Plate
+        99.27,  # Half Sphere
+        127.00, # Inverted Cup
+        146.92, # Sphere
+    ]
+
     lbf2N = 4.44822         # Conversion for lbf to N
     inlbs2Nm = 0.1129848333 # Conversion for in*lbf to N*m
     n = len(data)
@@ -113,8 +142,9 @@ def datasplit(data: list):
         data[0]['PM/YM']*inlbs2Nm,
         force2coeff(lF, data[0]['q']/psf2pa),
         force2coeff(dF, data[0]['q']/psf2pa)
-        
     )
+    
+    list[0].PM = momentTransfer(list[0].PM, list[0].NF, B[0])
     
     # Iterate through data to split for each shape and assign different types of
     # data to object properties.
@@ -127,6 +157,7 @@ def datasplit(data: list):
             force2coeff(data[i]['NF/SF']*lbf2N, data[i]['q']/psf2pa),
             force2coeff(data[i]['AF/AF2']*lbf2N, data[i]['q']/psf2pa)
         )   
+        list[i].PM = momentTransfer(list[i].PM, list[i].NF, B[i])
 
     return list
 
@@ -153,6 +184,8 @@ fig1, ax1 = plt.subplots() # Normal Force v Velocity
 fig2, ax2 = plt.subplots() # Axial Force v Velocity
 fig3, [ax3, ax3_2] = plt.subplots(2) # Normal/Axial Force v Angle of Attack
 fig4, [ax4, ax4_2] = plt.subplots(2) # Coefficient of Lift/Drag
+fig5, ax5 = plt.subplots() # Pitching Moment v Velocity
+
 
 # Savitsky-Golay filter coefficients
 wl = 151 # Window Length
@@ -257,6 +290,38 @@ ax4_2.plot(
     label='Coefficient of Drag'
 )
 
+# Pitching Moment v Wind Velocity
+ax5.set_xlabel('V_inf [m/s]')
+ax5.set_ylabel('Pitching Moment [N*m]')
+ax5.plot(
+    flatPlateVel.X,
+    flatPlateVel.PM,
+    'r-',
+    label='Flat Plate',
+    zorder=10
+)
+ax5.plot(
+    halfSphere.X,
+    halfSphere.PM,
+    'b-',
+    label='Half Sphere',
+    zorder=15
+)
+ax5.plot(
+    invertedCup.X,
+    invertedCup.PM,
+    'k-',
+    label='Inverted Cup',
+    zorder=5
+)
+ax5.plot(
+    sphere.X,
+    sphere.PM,
+    'g-',
+    label='Sphere',
+    zorder=0
+)
+
 # Graph formating
 ax1.set_title('Normal Force vs Free Stream Velocity')
 ax1.set_xlim(xmin=0)
@@ -270,4 +335,7 @@ ax3_2.set_xlim(xmin=0)
 ax4.set_title('Coefficient of Lift vs Angle of Attack')
 ax4.set_xlim(xmin=0)
 ax4_2.set_xlim(xmin=0)
+ax5.set_title('Pitching Moment vs Free Stream Velocity')
+ax5.set_xlim(xmin=0)
+ax5.legend()
 plt.show()
