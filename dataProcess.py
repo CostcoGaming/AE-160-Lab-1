@@ -24,7 +24,7 @@ class Data:
         self.CL = coefficientLift
         self.CD = coefficientDrag
 
-def read_files(files: list[str]):
+def read_files(files:list[str]):
     '''This function reads .csv a list of files and turns it into a list of 
     pandas dataframes'''
     
@@ -38,7 +38,7 @@ def read_files(files: list[str]):
 
     return new_files
 
-def q2v(q: list):
+def q2v(q:list):
     '''This function uses the ideal gas law and the dynamic pressure equation
     in order to convert dynamic pressure into wind velocity'''
     T = 296.15        # K (Found from National Weather Service website)
@@ -52,11 +52,10 @@ def q2v(q: list):
     
     return vel
 
-def force2coeff(force: list, q: list):
+def force2coeff(force:list, q:list, S:int):
     '''This function converts force into coefficients (i.e, lift force --> 
     coefficient of lift)'''
     n = len(force)
-    S = 0.01 # m (Length of object)
     
     coefficient = [0]*n # Initialize list
 
@@ -69,7 +68,7 @@ def force2coeff(force: list, q: list):
         
     return coefficient
 
-def NA2LD(N:list, A:list, alphaDeg: list):
+def NA2LD(N:list, A:list, alphaDeg:list):
     '''This function takes normal/axial force and angle of attack and converts
     it into lift/drag force'''
     
@@ -106,7 +105,7 @@ def datasplit(data: list):
     '''This function splits dataframe into: Alpha/Velocity, Normal Force,
     Axial Force, and Pitching Moment. Also converts forces into metric.'''
     
-    diameters = [
+    diameters = [ # Diameters in mm
         74.82, # Flat Plate
         74.82, # Flat Plate
         75.48, # Half Sphere
@@ -114,13 +113,17 @@ def datasplit(data: list):
         76.21  # Sphere
     ]
 
-    B = [
-        98.42,  # Flat Plate
+    diameters = diameters/1000 # Convert to m
+
+    B = [       # B Value in mm
+        98.42,  # Flat Plate 
         98.42,  # Flat Plate
         99.27,  # Half Sphere
         127.00, # Inverted Cup
         146.92, # Sphere
     ]
+
+    B = B/1000 # Convert to m
 
     lbf2N = 4.44822         # Conversion for lbf to N
     inlbs2Nm = 0.1129848333 # Conversion for in*lbf to N*m
@@ -140,8 +143,8 @@ def datasplit(data: list):
         data[0]['NF/SF']*lbf2N,
         data[0]['AF/AF2']*lbf2N,
         data[0]['PM/YM']*inlbs2Nm,
-        force2coeff(lF, data[0]['q']/psf2pa),
-        force2coeff(dF, data[0]['q']/psf2pa)
+        force2coeff(lF, data[0]['q']/psf2pa, diameters[0]),
+        force2coeff(dF, data[0]['q']/psf2pa, diameters[0])
     )
     
     list[0].PM = momentTransfer(list[0].PM, list[0].NF, B[0])
@@ -154,8 +157,8 @@ def datasplit(data: list):
             data[i]['NF/SF']*lbf2N,    # Normal Force
             data[i]['AF/AF2']*lbf2N,   # Axial Force
             data[i]['PM/YM']*inlbs2Nm, # Pitching Moment
-            force2coeff(data[i]['NF/SF']*lbf2N, data[i]['q']/psf2pa),
-            force2coeff(data[i]['AF/AF2']*lbf2N, data[i]['q']/psf2pa)
+            force2coeff(data[i]['NF/SF']*lbf2N, data[i]['q']/psf2pa, diameters[i]),
+            force2coeff(data[i]['AF/AF2']*lbf2N, data[i]['q']/psf2pa, diameters[i])
         )   
         list[i].PM = momentTransfer(list[i].PM, list[i].NF, B[i])
 
