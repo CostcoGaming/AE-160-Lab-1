@@ -56,8 +56,7 @@ def force2coeff(force:list[int], q:list[int], S:int):
     '''This function converts force into its corresponding coefficients 
     (i.e, lift force --> coefficient of lift)'''
     n = len(force)
-    
-    coefficient = [0]*n # Initialize list
+    coefficient = [0]*n # Initializing list
 
     # Iterate through force & q in order to find coefficients.
     for i in range(0,n):
@@ -72,7 +71,11 @@ def moment2coeff(moment, q, S):
     '''This functions converts pitching moment into its corresponding pitching
     moment coefficient.'''
     
+    n = len(moment)
+    coefficient = [0]*n # Initializing list
     
+    # Iterate through moments 
+
     return
 
 def NA2LD(N:list, A:list, alphaDeg:list):
