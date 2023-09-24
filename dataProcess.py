@@ -38,7 +38,7 @@ def read_files(files:list[str]):
 
     return new_files
 
-def q2v(q:list):
+def q2v(q:list[int]):
     '''This function uses the ideal gas law and the dynamic pressure equation
     in order to convert dynamic pressure into wind velocity'''
     T = 296.15        # K (Found from National Weather Service website)
@@ -52,9 +52,9 @@ def q2v(q:list):
     
     return vel
 
-def force2coeff(force:list, q:list, S:int):
-    '''This function converts force into coefficients (i.e, lift force --> 
-    coefficient of lift)'''
+def force2coeff(force:list[int], q:list[int], S:int):
+    '''This function converts force into its corresponding coefficients 
+    (i.e, lift force --> coefficient of lift)'''
     n = len(force)
     
     coefficient = [0]*n # Initialize list
@@ -67,6 +67,13 @@ def force2coeff(force:list, q:list, S:int):
             coefficient[i] = force[i]/(q[i]*S)
         
     return coefficient
+
+def moment2coeff(moment, q, S):
+    '''This functions converts pitching moment into its corresponding pitching
+    moment coefficient.'''
+    
+    
+    return
 
 def NA2LD(N:list, A:list, alphaDeg:list):
     '''This function takes normal/axial force and angle of attack and converts
@@ -88,11 +95,11 @@ def NA2LD(N:list, A:list, alphaDeg:list):
 
     return liftForce, dragForce
 
-def momentTransfer(moment, normal, b):
+def moment_transfer(moment, normal, b):
     A = 28.829/1000 # m
     D = 71.04/1000 # m
     n = len(moment)
-    C = D-(b/1000)    
+    C = D-b    
 
     new_moment = [0]*n
     
@@ -101,7 +108,7 @@ def momentTransfer(moment, normal, b):
         
     return new_moment
 
-def datasplit(data: list):
+def data_split(data: list):
     '''This function splits dataframe into: Alpha/Velocity, Normal Force,
     Axial Force, and Pitching Moment. Also converts forces into metric.'''
     
@@ -113,8 +120,6 @@ def datasplit(data: list):
         76.21  # Sphere
     ]
 
-    diameters = diameters/1000 # Convert to m
-
     B = [       # B Value in mm
         98.42,  # Flat Plate 
         98.42,  # Flat Plate
@@ -123,7 +128,8 @@ def datasplit(data: list):
         146.92, # Sphere
     ]
 
-    B = B/1000 # Convert to m
+    diameters[:] = [x/1000 for x in diameters] # Convert to m
+    B[:] = [x/1000 for x in B] # Convert to m
 
     lbf2N = 4.44822         # Conversion for lbf to N
     inlbs2Nm = 0.1129848333 # Conversion for in*lbf to N*m
@@ -147,7 +153,7 @@ def datasplit(data: list):
         force2coeff(dF, data[0]['q']/psf2pa, diameters[0])
     )
     
-    list[0].PM = momentTransfer(list[0].PM, list[0].NF, B[0])
+    list[0].PM = moment_transfer(list[0].PM, list[0].NF, B[0])
     
     # Iterate through data to split for each shape and assign different types of
     # data to object properties.
@@ -160,7 +166,7 @@ def datasplit(data: list):
             force2coeff(data[i]['NF/SF']*lbf2N, data[i]['q']/psf2pa, diameters[i]),
             force2coeff(data[i]['AF/AF2']*lbf2N, data[i]['q']/psf2pa, diameters[i])
         )   
-        list[i].PM = momentTransfer(list[i].PM, list[i].NF, B[i])
+        list[i].PM = moment_transfer(list[i].PM, list[i].NF, B[i])
 
     return list
 
@@ -180,7 +186,7 @@ files = [
 
 data = read_files(files)
 
-flatPlateAng, flatPlateVel, halfSphere, invertedCup, sphere = datasplit(data)
+flatPlateAng, flatPlateVel, halfSphere, invertedCup, sphere = data_split(data)
 
 # Set up window
 fig1, ax1 = plt.subplots() # Normal Force v Velocity
