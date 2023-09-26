@@ -235,36 +235,65 @@ ax4_2.plot(
     linewidth=lnwidth
 )
 
+flatPlateVelXPM, flatPlateVelYPM, _, _ = get_linear_curve(flatPlateVel.X, flatPlateVel.PM)
+halfSphereXPM, halfSphereYPM, _, _ = get_linear_curve(halfSphere.X, halfSphere.PM)
+invertedCupXPM, invertedCupYPM, _, _ = get_linear_curve(invertedCup.X, invertedCup.PM)
+sphereXPM, sphereYPM, _, _ = get_linear_curve(sphere.X, sphere.PM)
+
 # Pitching Moment v Wind Velocity
 ax5.set_xlabel('V_inf [m/s]')
 ax5.set_ylabel('Pitching Moment [N*m]')
-ax5.plot(
+ax5.scatter(
     flatPlateVel.X,
     flatPlateVel.PM,
-    'r-',
-    label='Flat Plate',
-    zorder=10
+    s=size,
+    c='blue'
 )
-ax5.plot(
+ax5.scatter(
     halfSphere.X,
     halfSphere.PM,
-    'b-',
-    label='Half Sphere',
-    zorder=15
+    s=size,
+    c='green'
 )
-ax5.plot(
+ax5.scatter(
     invertedCup.X,
     invertedCup.PM,
-    'k-',
-    label='Inverted Cup',
-    zorder=5
+    s=size,
+    c='red'
 )
-ax5.plot(
+ax5.scatter(
     sphere.X,
     sphere.PM,
+    s=size,
+    c='black'
+)
+ax5.plot(
+    flatPlateVelXPM,
+    flatPlateVelYPM,
+    'b-',
+    label='Flat Plate',
+    linewidth=lnwidth
+)
+ax5.plot(
+    halfSphereXPM,
+    halfSphereYPM,
     'g-',
+    label='Half Sphere',
+    linewidth=lnwidth
+)
+ax5.plot(
+    invertedCupXPM,
+    invertedCupYPM,
+    'r-',
+    label='Inverted Cup',
+    linewidth=lnwidth
+)
+ax5.plot(
+    sphereXPM,
+    sphereYPM,
+    'k-',
     label='Sphere',
-    zorder=0
+    linewidth=lnwidth
 )
 
 # Graph formating
