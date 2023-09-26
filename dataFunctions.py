@@ -1,5 +1,7 @@
 import math
 import pandas as pd
+from scipy.optimize import curve_fit as cf
+import numpy as np
 
 # Create global variables
 global psf2pa
@@ -109,6 +111,19 @@ def moment_transfer(moment:list[int], normal:list[int], b:list[int]):
         
     return new_moment
 
+def AF_Curve(x, a, b, c):
+    return a*x**2 + b*x + c
+
+def get_xy_line(x, y):
+    popt, _ = cf(AF_Curve, x, y)
+
+    a, b, c = popt
+
+    x_line = np.arange(min(x), max(x))
+    y_line = AF_Curve(x_line, a, b, c)
+
+    return [x_line, y_line, a, b, c]
+
 def data_split(data:list):
     '''This function splits dataframe into: Alpha/Velocity, Normal Force,
     Axial Force, and Pitching Moment. Also converts forces into metric.'''
@@ -160,7 +175,6 @@ def data_split(data:list):
     
     list[0].PM = moment_transfer(list[0].PM, list[0].NF, B[0])
 
-    list = [1]*n
     list[1] = Data(
         data[1]['Alpha'],
         data[1]['NF/SF']*lbf2N,

@@ -22,13 +22,13 @@ data = read_files(files)
 
 zeroVel, flatPlateAng, flatPlateVel, halfSphere, invertedCup, sphere = data_split(data)
 
+flatPlateVelXLine, flatPlateVelYLine, a1, b1, c1 = get_xy_line(flatPlateVel.X, flatPlateVel.AF)
+halfSphereXLine, halfSphereYLine, a2, b2, c2 = get_xy_line(halfSphere.X, halfSphere.AF)
+invertedCupXLine, invertedCupYLine, a3, b3, c3 = get_xy_line(invertedCup.X, invertedCup.AF)
+sphereXLine, sphereYLine, a4, b4, c4 = get_xy_line(sphere.X, sphere.AF)
+
 # Set up window
 fig1, ax1 = plt.subplots() # Normal Force v Velocity
-fig2, ax2 = plt.subplots() # Axial Force v Velocity
-fig3, [ax3, ax3_2] = plt.subplots(2) # Normal/Axial Force v Angle of Attack
-fig4, [ax4, ax4_2] = plt.subplots(2) # Coefficient of Lift/Drag
-fig5, ax5 = plt.subplots() # Pitching Moment v Velocity
-
 
 # Savitsky-Golay filter coefficients
 wl = 151 # Window Length
@@ -66,38 +66,69 @@ ax1.plot(
     zorder=0
 )
 
+fig2, ax2 = plt.subplots() # Axial Force v Velocity
 # Axial Force v Velocity
 ax2.set_xlabel('V_inf [m/s]')
 ax2.set_ylabel('Axial Force [N]')
-ax2.plot(
-    sf(flatPlateVel.X, wl, po),
-    sf(flatPlateVel.AF, wl, po),
-    'r-',
-    label='Flat Plate',
-    zorder=5
+size = 0.5
+
+# Scatter Plot for individual points
+plt.scatter(
+    flatPlateVel.X,
+    flatPlateVel.AF,
+    s=size,
+    c='blue'
 )
-ax2.plot(
-    sf(halfSphere.X, wl, po),
-    sf(halfSphere.AF, wl, po),
-    'b-',
-    label='Half Sphere',
-    zorder=10
+plt.scatter(
+    halfSphere.X,
+    halfSphere.AF,
+    s=size,
+    c='green'
 )
-ax2.plot(
-    sf(invertedCup.X, wl, po),
-    sf(invertedCup.AF, wl, po),
-    'k-',
-    label='Inverted Cup',
-    zorder=15
+plt.scatter(
+    invertedCup.X,
+    invertedCup.AF,
+    s=size,
+    c='red'
 )
-ax2.plot(
-    sf(sphere.X, wl, po),
-    sf(sphere.AF, wl, po),
-    'g-',
-    label='Sphere',
-    zorder=0
+plt.scatter(
+    sphere.X,
+    sphere.AF,
+    s=size,
+    c='black'
 )
 
+# Curve Fit Line
+plt.plot(
+    flatPlateVelXLine,
+    flatPlateVelYLine,
+    'b-',
+    label='Flat Plate'
+)
+plt.plot(
+    halfSphereXLine,
+    halfSphereYLine,
+    'g-',
+    label='Half Sphere'
+)
+plt.plot(
+    invertedCupXLine,
+    invertedCupYLine,
+    'r-',
+    label='Inverted Cup'
+)
+plt.plot(
+    sphereXLine,
+    sphereYLine,
+    'k-',
+    label='Sphere'
+)
+
+a = [a1, a2, a3, a4]
+b = [b1, b2, b3, b4]
+c = [c1, c2, c3, c4]
+
+fig3, [ax3, ax3_2] = plt.subplots(2) # Normal/Axial Force v Angle of Attack
 # Normal/Axial Force v Angle of Attack
 ax3.set_xlabel('Alpha [deg]')
 ax3.set_ylabel('Normal Force [N]')
@@ -116,6 +147,7 @@ ax3_2.plot(
     label='Axial Force'
 )
 
+fig4, [ax4, ax4_2] = plt.subplots(2) # Coefficient of Lift/Drag
 ax4.set_xlabel('Alpha [deg]')
 ax4.set_ylabel('Lift Coefficient')
 ax4.plot(
@@ -133,6 +165,7 @@ ax4_2.plot(
     label='Coefficient of Drag'
 )
 
+fig5, ax5 = plt.subplots() # Pitching Moment v Velocity
 # Pitching Moment v Wind Velocity
 ax5.set_xlabel('V_inf [m/s]')
 ax5.set_ylabel('Pitching Moment [N*m]')
@@ -181,4 +214,8 @@ ax4_2.set_xlim(xmin=0)
 ax5.set_title('Pitching Moment vs Free Stream Velocity')
 ax5.set_xlim(xmin=0)
 ax5.legend()
+print("Curve Fit Lines:")
+for i in range(0, len(a)):
+    print("y%s = %.5f*x^2 + %.5f*x + %.5f" % (i+1, a[i], b[i], c[i]))
+ax2.set_title('Axial Force vs Free Stream Velocity')
 plt.show()
