@@ -72,6 +72,7 @@ ax1.scatter(
     label='Sphere'
 )
 
+# Curve Fit Lines (Linear)
 ax1.plot(
     flatPlateVelXNF,
     flatPlateVelYNF,
@@ -136,7 +137,7 @@ ax2.scatter(
     c='black'
 )
 
-# Curve Fit Line
+# Curve Fit Lines (Quadratic)
 ax2.plot(
     flatPlateVelXAF,
     flatPlateVelYAF,
@@ -186,6 +187,8 @@ ax3_2.scatter(
     s=size,
     c='blue'
 )
+
+# Curve Fit Lines (Linear)
 ax3.plot(
     flatPlateAngXNF,
     flatPlateAngYNF,
@@ -220,6 +223,8 @@ ax4_2.scatter(
     s=size,
     c='blue'
 )
+
+# Curve Fit Lines (Cubic)
 ax4.plot(
     flatPlateAngXCL,
     flatPlateAngYCL,
@@ -267,6 +272,8 @@ ax5.scatter(
     s=size,
     c='black'
 )
+
+# Curve Fit Lines (Linear)
 ax5.plot(
     flatPlateVelXPM,
     flatPlateVelYPM,
