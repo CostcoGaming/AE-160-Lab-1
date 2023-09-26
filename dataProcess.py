@@ -32,7 +32,7 @@ fig5, ax5 = plt.subplots() # Pitching Moment v Velocity
 # Parameters
 wl = 151 # Window Length
 po = 2   # Polynomial Order
-size = 0.25
+size = 0.5
 lnwidth = 2
 
 flatPlateVelXNF, flatPlateVelYNF, _, _ = get_linear_curve(flatPlateVel.X, flatPlateVel.NF)
@@ -48,28 +48,24 @@ ax1.scatter(
     flatPlateVel.NF,
     c='blue',
     s=size,
-    label='Flat Plate'
 )
 ax1.scatter(
     halfSphere.X,
     halfSphere.NF,
     c='green',
-    s=size,
-    label='Half Sphere'    
+    s=size,    
 )
 ax1.scatter(
     invertedCup.X,
     invertedCup.NF,
     s=size,
     c='red',
-    label='Inverted Cup'
 )
 ax1.scatter(
     sphere.X,
     sphere.NF,
     s=size,
     c='black',
-    label='Sphere'
 )
 
 # Curve Fit Lines (Linear)
