@@ -29,10 +29,15 @@ sphereXLine, sphereYLine, a4, b4, c4 = get_xy_line(sphere.X, sphere.AF)
 
 # Set up window
 fig1, ax1 = plt.subplots() # Normal Force v Velocity
+fig2, ax2 = plt.subplots() # Axial Force v Velocity
+fig3, [ax3, ax3_2] = plt.subplots(2) # Normal/Axial Force v Angle of Attack
+fig4, [ax4, ax4_2] = plt.subplots(2) # Coefficient of Lift/Drag
+fig5, ax5 = plt.subplots() # Pitching Moment v Velocity
 
-# Savitsky-Golay filter coefficients
+# Parameters
 wl = 151 # Window Length
 po = 2   # Polynomial Order
+size = 0.5
 
 # Normal Force v Velocity
 ax1.set_xlabel('V_inf [m/s]')
@@ -66,32 +71,30 @@ ax1.plot(
     zorder=0
 )
 
-fig2, ax2 = plt.subplots() # Axial Force v Velocity
 # Axial Force v Velocity
 ax2.set_xlabel('V_inf [m/s]')
 ax2.set_ylabel('Axial Force [N]')
-size = 0.5
 
 # Scatter Plot for individual points
-plt.scatter(
+ax2.scatter(
     flatPlateVel.X,
     flatPlateVel.AF,
     s=size,
     c='blue'
 )
-plt.scatter(
+ax2.scatter(
     halfSphere.X,
     halfSphere.AF,
     s=size,
     c='green'
 )
-plt.scatter(
+ax2.scatter(
     invertedCup.X,
     invertedCup.AF,
     s=size,
     c='red'
 )
-plt.scatter(
+ax2.scatter(
     sphere.X,
     sphere.AF,
     s=size,
@@ -99,25 +102,25 @@ plt.scatter(
 )
 
 # Curve Fit Line
-plt.plot(
+ax2.plot(
     flatPlateVelXLine,
     flatPlateVelYLine,
     'b-',
     label='Flat Plate'
 )
-plt.plot(
+ax2.plot(
     halfSphereXLine,
     halfSphereYLine,
     'g-',
     label='Half Sphere'
 )
-plt.plot(
+ax2.plot(
     invertedCupXLine,
     invertedCupYLine,
     'r-',
     label='Inverted Cup'
 )
-plt.plot(
+ax2.plot(
     sphereXLine,
     sphereYLine,
     'k-',
@@ -128,7 +131,6 @@ a = [a1, a2, a3, a4]
 b = [b1, b2, b3, b4]
 c = [c1, c2, c3, c4]
 
-fig3, [ax3, ax3_2] = plt.subplots(2) # Normal/Axial Force v Angle of Attack
 # Normal/Axial Force v Angle of Attack
 ax3.set_xlabel('Alpha [deg]')
 ax3.set_ylabel('Normal Force [N]')
@@ -147,7 +149,6 @@ ax3_2.plot(
     label='Axial Force'
 )
 
-fig4, [ax4, ax4_2] = plt.subplots(2) # Coefficient of Lift/Drag
 ax4.set_xlabel('Alpha [deg]')
 ax4.set_ylabel('Lift Coefficient')
 ax4.plot(
@@ -165,7 +166,6 @@ ax4_2.plot(
     label='Coefficient of Drag'
 )
 
-fig5, ax5 = plt.subplots() # Pitching Moment v Velocity
 # Pitching Moment v Wind Velocity
 ax5.set_xlabel('V_inf [m/s]')
 ax5.set_ylabel('Pitching Moment [N*m]')
