@@ -32,45 +32,79 @@ fig5, ax5 = plt.subplots() # Pitching Moment v Velocity
 # Parameters
 wl = 151 # Window Length
 po = 2   # Polynomial Order
-size = 0.5
+size = 0.25
 lnwidth = 2
+
+flatPlateVelXNF, flatPlateVelYNF, _, _ = get_linear_curve(flatPlateVel.X, flatPlateVel.NF)
+halfSphereXNF, halfSphereYNF, _, _ = get_linear_curve(halfSphere.X, halfSphere.NF)
+invertedCupXNF, invertedCupYNF, _, _ = get_linear_curve(invertedCup.X, invertedCup.NF)
+sphereXNF, sphereYNF, _, _ = get_linear_curve(sphere.X, sphere.NF)
 
 # Normal Force v Velocity
 ax1.set_xlabel('V_inf [m/s]')
 ax1.set_ylabel('Normal Force [N]')
-ax1.plot(
-    sf(flatPlateVel.X, wl, po),
+ax1.scatter(
+    flatPlateVel.X,
     flatPlateVel.NF,
-    'r-',
-    label='Flat Plate',
-    zorder=10
+    c='blue',
+    s=size,
+    label='Flat Plate'
 )
-ax1.plot(
-    sf(halfSphere.X, wl, po),    
+ax1.scatter(
+    halfSphere.X,
     halfSphere.NF,
-    'b-',
-    label='Half Sphere',
-    zorder=15 
+    c='green',
+    s=size,
+    label='Half Sphere'    
 )
-ax1.plot(
-    sf(invertedCup.X, wl, po),
+ax1.scatter(
+    invertedCup.X,
     invertedCup.NF,
-    'k-',
-    label='Inverted Cup',
-    zorder=5
+    s=size,
+    c='red',
+    label='Inverted Cup'
 )
-ax1.plot(
-    sf(sphere.X, wl, po),
+ax1.scatter(
+    sphere.X,
     sphere.NF,
-    'g-',
-    label='Sphere',
-    zorder=0
+    s=size,
+    c='black',
+    label='Sphere'
 )
 
-flatPlateVelXLine, flatPlateVelYLine, a1, b1, c1 = get_AF_curve(flatPlateVel.X, flatPlateVel.AF)
-halfSphereXLine, halfSphereYLine, a2, b2, c2 = get_AF_curve(halfSphere.X, halfSphere.AF)
-invertedCupXLine, invertedCupYLine, a3, b3, c3 = get_AF_curve(invertedCup.X, invertedCup.AF)
-sphereXLine, sphereYLine, a4, b4, c4 = get_AF_curve(sphere.X, sphere.AF)
+ax1.plot(
+    flatPlateVelXNF,
+    flatPlateVelYNF,
+    'b-',
+    label='Flat Plate',
+    linewidth=lnwidth
+)
+ax1.plot(
+    halfSphereXNF,
+    halfSphereYNF,
+    'g-',
+    label='Half Sphere',
+    linewidth=lnwidth
+)
+ax1.plot(
+    invertedCupXNF,
+    invertedCupYNF,
+    'r-',
+    label='Inverted Cup',
+    linewidth=lnwidth
+)
+ax1.plot(
+    sphereXNF,
+    sphereYNF,
+    'k-',
+    label='Sphere',
+    linewidth=lnwidth
+)
+
+flatPlateVelXAF, flatPlateVelYAF, _, _, _ = get_quadratic_curve(flatPlateVel.X, flatPlateVel.AF)
+halfSphereXAF, halfSphereYAF, _, _, _ = get_quadratic_curve(halfSphere.X, halfSphere.AF)
+invertedCupXAF, invertedCupYAF, _, _, _ = get_quadratic_curve(invertedCup.X, invertedCup.AF)
+sphereXAF, sphereYAF, _, _, _ = get_quadratic_curve(sphere.X, sphere.AF)
 
 # Axial Force v Velocity
 ax2.set_xlabel('V_inf [m/s]')
@@ -104,36 +138,36 @@ ax2.scatter(
 
 # Curve Fit Line
 ax2.plot(
-    flatPlateVelXLine,
-    flatPlateVelYLine,
+    flatPlateVelXAF,
+    flatPlateVelYAF,
     'b-',
-    label='Flat Plate'
+    label='Flat Plate',
+    linewidth=lnwidth
 )
 ax2.plot(
-    halfSphereXLine,
-    halfSphereYLine,
+    halfSphereXAF,
+    halfSphereYAF,
     'g-',
-    label='Half Sphere'
+    label='Half Sphere',
+    linewidth=lnwidth
 )
 ax2.plot(
-    invertedCupXLine,
-    invertedCupYLine,
+    invertedCupXAF,
+    invertedCupYAF,
     'r-',
-    label='Inverted Cup'
+    label='Inverted Cup',
+    linewidth=lnwidth
 )
 ax2.plot(
-    sphereXLine,
-    sphereYLine,
+    sphereXAF,
+    sphereYAF,
     'k-',
-    label='Sphere'
+    label='Sphere',
+    linewidth=lnwidth
 )
 
-a = [a1, a2, a3, a4]
-b = [b1, b2, b3, b4]
-c = [c1, c2, c3, c4]
-
-flatPlateAngXNF, flatPlateAngYNF, a5, b5 = get_aoa_curve(flatPlateAng.X, flatPlateAng.NF)
-flatPlateAngXAF, flatPlateAngYAF, a6, b6 = get_aoa_curve(flatPlateAng.X, flatPlateAng.AF)
+flatPlateAngXNF, flatPlateAngYNF, _, _ = get_linear_curve(flatPlateAng.X, flatPlateAng.NF)
+flatPlateAngXAF, flatPlateAngYAF, _, _ = get_linear_curve(flatPlateAng.X, flatPlateAng.AF)
 
 # Normal/Axial Force v Angle of Attack
 ax3.set_xlabel('Alpha [deg]')
@@ -167,8 +201,8 @@ ax3_2.plot(
     linewidth=lnwidth
 )
 
-flatPlateAngXCL, flatPlateAngYCL, a5, b5, c5, d5 = get_coeff_curve(flatPlateAng.X, flatPlateAng.CL)
-flatPlateAngXCD, flatPlateAngYCD, a6, b6, c6, d6 = get_coeff_curve(flatPlateAng.X, flatPlateAng.CD)
+flatPlateAngXCL, flatPlateAngYCL, _, _, _, _ = get_cubic_curve(flatPlateAng.X, flatPlateAng.CL)
+flatPlateAngXCD, flatPlateAngYCD, _, _, _, _ = get_cubic_curve(flatPlateAng.X, flatPlateAng.CD)
 
 ax4.set_xlabel('Alpha [deg]')
 ax4.set_ylabel('Lift Coefficient')
@@ -190,13 +224,15 @@ ax4.plot(
     flatPlateAngXCL,
     flatPlateAngYCL,
     'r-',
-    label='Coefficient of Lift'
+    label='Coefficient of Lift',
+    linewidth=lnwidth
 )
 ax4_2.plot(
     flatPlateAngXCD,
     flatPlateAngYCD,
     'b-',
-    label='Coefficient of Drag'
+    label='Coefficient of Drag',
+    linewidth=lnwidth
 )
 
 # Pitching Moment v Wind Velocity
@@ -247,8 +283,4 @@ ax4_2.set_xlim(xmin=0)
 ax5.set_title('Pitching Moment vs Free Stream Velocity')
 ax5.set_xlim(xmin=0)
 ax5.legend()
-print("Curve Fit Lines:")
-for i in range(0, len(a)):
-    print("y%s = %.5f*x^2 + %.5f*x + %.5f" % (i+1, a[i], b[i], c[i]))
-ax2.set_title('Axial Force vs Free Stream Velocity')
 plt.show()
