@@ -10,6 +10,7 @@ from dataFunctions import *
 # Read Files
 path = str(Path(__file__).parent)+'/Data' # Finds current path and Data folder
 files = [
+    path+'/Zero Velocity Flat Plate Angle.csv',
     path+'/Flat Plate Angle.csv',
     path+'/Flat Plate Velocity.csv',
     path+'/Half Sphere.csv',
@@ -19,7 +20,7 @@ files = [
 
 data = read_files(files)
 
-flatPlateAng, flatPlateVel, halfSphere, invertedCup, sphere = data_split(data)
+zeroVel, flatPlateAng, flatPlateVel, halfSphere, invertedCup, sphere = data_split(data)
 
 # Set up window
 fig1, ax1 = plt.subplots() # Normal Force v Velocity

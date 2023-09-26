@@ -116,12 +116,14 @@ def data_split(data:list):
     diameters = [ # Diameters in mm
         74.82, # Flat Plate
         74.82, # Flat Plate
+        74.82, # Flat Plate
         75.48, # Half Sphere
         75.40, # Inverted Cup
         76.21  # Sphere
     ]
 
     B = [       # B Value in mm
+        98.42,  # Flat Plate 
         98.42,  # Flat Plate 
         98.42,  # Flat Plate
         99.27,  # Half Sphere
@@ -138,8 +140,10 @@ def data_split(data:list):
 
     # Find lifting force and drag force based on AoA and normal/axial forces.
     # Only for flat plate angle
-    lF, dF = NA2LD(data[0]['NF/SF']*lbf2N, data[0]['AF/AF2']*lbf2N,
+    lF0, dF0 = NA2LD(data[0]['NF/SF']*lbf2N, data[0]['AF/AF2']*lbf2N,
                    data[0]['Alpha'])
+    lF, dF = NA2LD(data[1]['NF/SF']*lbf2N, data[1]['AF/AF2']*lbf2N,
+                   data[1]['Alpha'])
     
     # Separate Flat Plate Angle from other data, since x axis will be AoA
     # rather than wind velocity.
@@ -150,15 +154,27 @@ def data_split(data:list):
         data[0]['NF/SF']*lbf2N,
         data[0]['AF/AF2']*lbf2N,
         data[0]['PM/YM']*inlbs2Nm,
-        force2coeff(lF, data[0]['q']/psf2pa, diameters[0]),
-        force2coeff(dF, data[0]['q']/psf2pa, diameters[0])
+        force2coeff(lF0, data[0]['q']/psf2pa, diameters[0]),
+        force2coeff(dF0, data[0]['q']/psf2pa, diameters[0])
     )
     
     list[0].PM = moment_transfer(list[0].PM, list[0].NF, B[0])
+
+    list = [1]*n
+    list[1] = Data(
+        data[1]['Alpha'],
+        data[1]['NF/SF']*lbf2N,
+        data[1]['AF/AF2']*lbf2N,
+        data[1]['PM/YM']*inlbs2Nm,
+        force2coeff(lF, data[1]['q']/psf2pa, diameters[1]),
+        force2coeff(dF, data[1]['q']/psf2pa, diameters[1])
+    )
+    
+    list[1].PM = moment_transfer(list[1].PM, list[1].NF, B[1])
     
     # Iterate through data to split for each shape and assign different types of
     # data to object properties.
-    for i in range(1,n):
+    for i in range(2,n):
         list[i] = Data( # Assume NF/AF == LF/DF since AoA = 0
             q2v(data[i]['q']),         # convert 'q' column into v_inf
             data[i]['NF/SF']*lbf2N,    # Normal Force
