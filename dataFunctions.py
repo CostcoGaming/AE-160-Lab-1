@@ -114,7 +114,7 @@ def moment_transfer(moment:list[int], normal:list[int], b:list[int]):
 def AF_Curve(x, a, b, c):
     return a*x**2 + b*x + c
 
-def get_xy_line(x, y):
+def get_AF_line(x, y):
     popt, _ = cf(AF_Curve, x, y)
 
     a, b, c = popt
@@ -123,6 +123,19 @@ def get_xy_line(x, y):
     y_line = AF_Curve(x_line, a, b, c)
 
     return [x_line, y_line, a, b, c]
+
+def coeff_curve(x, a, b, c, d):
+    return a*x**3 + b*x**2 + c*x + d
+
+def get_coeff_curve(x, y):
+    popt, _ = cf(coeff_curve, x, y)
+    
+    a, b, c, d = popt
+    
+    x_line = np.arange(min(x), max(x))
+    y_line = coeff_curve(x_line, a, b, c, d)
+    
+    return [x_line, y_line, a, b, c, d]
 
 def data_split(data:list):
     '''This function splits dataframe into: Alpha/Velocity, Normal Force,

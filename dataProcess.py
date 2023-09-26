@@ -22,11 +22,6 @@ data = read_files(files)
 
 zeroVel, flatPlateAng, flatPlateVel, halfSphere, invertedCup, sphere = data_split(data)
 
-flatPlateVelXLine, flatPlateVelYLine, a1, b1, c1 = get_xy_line(flatPlateVel.X, flatPlateVel.AF)
-halfSphereXLine, halfSphereYLine, a2, b2, c2 = get_xy_line(halfSphere.X, halfSphere.AF)
-invertedCupXLine, invertedCupYLine, a3, b3, c3 = get_xy_line(invertedCup.X, invertedCup.AF)
-sphereXLine, sphereYLine, a4, b4, c4 = get_xy_line(sphere.X, sphere.AF)
-
 # Set up window
 fig1, ax1 = plt.subplots() # Normal Force v Velocity
 fig2, ax2 = plt.subplots() # Axial Force v Velocity
@@ -70,6 +65,11 @@ ax1.plot(
     label='Sphere',
     zorder=0
 )
+
+flatPlateVelXLine, flatPlateVelYLine, a1, b1, c1 = get_AF_line(flatPlateVel.X, flatPlateVel.AF)
+halfSphereXLine, halfSphereYLine, a2, b2, c2 = get_AF_line(halfSphere.X, halfSphere.AF)
+invertedCupXLine, invertedCupYLine, a3, b3, c3 = get_AF_line(invertedCup.X, invertedCup.AF)
+sphereXLine, sphereYLine, a4, b4, c4 = get_AF_line(sphere.X, sphere.AF)
 
 # Axial Force v Velocity
 ax2.set_xlabel('V_inf [m/s]')
@@ -149,19 +149,34 @@ ax3_2.plot(
     label='Axial Force'
 )
 
+flatPlateAngXCL, flatPlateAngYCL, a5, b5, c5, d5 = get_coeff_curve(flatPlateAng.X, flatPlateAng.CL)
+flatPlateAngXCD, flatPlateAngYCD, a6, b6, c6, d6 = get_coeff_curve(flatPlateAng.X, flatPlateAng.CD)
+
 ax4.set_xlabel('Alpha [deg]')
 ax4.set_ylabel('Lift Coefficient')
+ax4_2.set_xlabel('Alpha [deg]')
+ax4_2.set_ylabel('Drag Coefficient')
+ax4.scatter(
+    flatPlateAng.X,
+    flatPlateAng.CL,
+    s=size,
+    c='red'
+)
+ax4_2.scatter(
+    flatPlateAng.X,
+    flatPlateAng.CD,
+    s=size,
+    c='blue'
+)
 ax4.plot(
-    sf(flatPlateAng.X, wl, po),
-    sf(flatPlateAng.CL, wl, 1),
+    flatPlateAngXCL,
+    flatPlateAngYCL,
     'r-',
     label='Coefficient of Lift'
 )
-ax4_2.set_xlabel('Alpha [deg]')
-ax4_2.set_ylabel('Drag Coefficient')
 ax4_2.plot(
-    sf(flatPlateAng.X, wl, po),
-    sf(flatPlateAng.CD, wl, 1),
+    flatPlateAngXCD,
+    flatPlateAngYCD,
     'b-',
     label='Coefficient of Drag'
 )
