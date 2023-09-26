@@ -114,7 +114,7 @@ def moment_transfer(moment:list[int], normal:list[int], b:list[int]):
 def AF_Curve(x, a, b, c):
     return a*x**2 + b*x + c
 
-def get_AF_line(x, y):
+def get_AF_curve(x, y):
     popt, _ = cf(AF_Curve, x, y)
 
     a, b, c = popt
@@ -123,6 +123,19 @@ def get_AF_line(x, y):
     y_line = AF_Curve(x_line, a, b, c)
 
     return [x_line, y_line, a, b, c]
+
+def aoa_curve(x, a, b):
+    return a*x + b
+
+def get_aoa_curve(x, y):
+    popt, _ = cf(aoa_curve, x, y)
+    
+    a, b = popt
+    
+    x_line = np.arange(min(x), max(x))
+    y_line = aoa_curve(x_line, a, b)
+    
+    return [x_line, y_line, a, b]
 
 def coeff_curve(x, a, b, c, d):
     return a*x**3 + b*x**2 + c*x + d

@@ -33,6 +33,7 @@ fig5, ax5 = plt.subplots() # Pitching Moment v Velocity
 wl = 151 # Window Length
 po = 2   # Polynomial Order
 size = 0.5
+lnwidth = 2
 
 # Normal Force v Velocity
 ax1.set_xlabel('V_inf [m/s]')
@@ -66,10 +67,10 @@ ax1.plot(
     zorder=0
 )
 
-flatPlateVelXLine, flatPlateVelYLine, a1, b1, c1 = get_AF_line(flatPlateVel.X, flatPlateVel.AF)
-halfSphereXLine, halfSphereYLine, a2, b2, c2 = get_AF_line(halfSphere.X, halfSphere.AF)
-invertedCupXLine, invertedCupYLine, a3, b3, c3 = get_AF_line(invertedCup.X, invertedCup.AF)
-sphereXLine, sphereYLine, a4, b4, c4 = get_AF_line(sphere.X, sphere.AF)
+flatPlateVelXLine, flatPlateVelYLine, a1, b1, c1 = get_AF_curve(flatPlateVel.X, flatPlateVel.AF)
+halfSphereXLine, halfSphereYLine, a2, b2, c2 = get_AF_curve(halfSphere.X, halfSphere.AF)
+invertedCupXLine, invertedCupYLine, a3, b3, c3 = get_AF_curve(invertedCup.X, invertedCup.AF)
+sphereXLine, sphereYLine, a4, b4, c4 = get_AF_curve(sphere.X, sphere.AF)
 
 # Axial Force v Velocity
 ax2.set_xlabel('V_inf [m/s]')
@@ -131,22 +132,39 @@ a = [a1, a2, a3, a4]
 b = [b1, b2, b3, b4]
 c = [c1, c2, c3, c4]
 
+flatPlateAngXNF, flatPlateAngYNF, a5, b5 = get_aoa_curve(flatPlateAng.X, flatPlateAng.NF)
+flatPlateAngXAF, flatPlateAngYAF, a6, b6 = get_aoa_curve(flatPlateAng.X, flatPlateAng.AF)
+
 # Normal/Axial Force v Angle of Attack
 ax3.set_xlabel('Alpha [deg]')
 ax3.set_ylabel('Normal Force [N]')
-ax3.plot(
+ax3_2.set_xlabel('Alpha [deg]')
+ax3_2.set_ylabel('Axial Force [N]]')
+ax3.scatter(
     flatPlateAng.X,
     flatPlateAng.NF,
-    'r-',
-    label='Normal Force'
+    s=size,
+    c='red'
 )
-ax3_2.set_xlabel('Alpha [deg]')
-ax3_2.set_ylabel('Axial Force [N]')
-ax3_2.plot(
+ax3_2.scatter(
     flatPlateAng.X,
     flatPlateAng.AF,
+    s=size,
+    c='blue'
+)
+ax3.plot(
+    flatPlateAngXNF,
+    flatPlateAngYNF,
+    'r-',
+    label='Normal Force',
+    linewidth=lnwidth
+)
+ax3_2.plot(
+    flatPlateAngXAF,
+    flatPlateAngYAF,
     'b-',
-    label='Axial Force'
+    label='Axial Force',
+    linewidth=lnwidth
 )
 
 flatPlateAngXCL, flatPlateAngYCL, a5, b5, c5, d5 = get_coeff_curve(flatPlateAng.X, flatPlateAng.CL)
