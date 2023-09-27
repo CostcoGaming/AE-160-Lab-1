@@ -163,8 +163,13 @@ ax2.plot(
     linewidth=lnwidth
 )
 
-flatPlateAngXNF, flatPlateAngYNF, _, _ = get_linear_curve(flatPlateAng.X, flatPlateAng.NF)
-flatPlateAngXAF, flatPlateAngYAF, _, _ = get_linear_curve(flatPlateAng.X, flatPlateAng.AF)
+flatPlateAngXNF, flatPlateAngYNF, a1, b1 = get_linear_curve(flatPlateAng.X, flatPlateAng.NF)
+flatPlateAngXAF, flatPlateAngYAF, a2, b2 = get_linear_curve(flatPlateAng.X, flatPlateAng.AF)
+zeroVelXNF, zeroVelYNF, a3, b3 = get_linear_curve(zeroVel.X, zeroVel.NF)
+zeroVelXAF, zeroVelYAF, a4, b4 = get_linear_curve(zeroVel.X, zeroVel.AF)
+
+flatPlateAngXNF, flatPlateAngYNF = calibrate_curve(flatPlateAng.X, a1, a3, b1, b3)
+flatPlateAngXAF, flatPlateAngYAF = calibrate_curve(flatPlateAng.X, a2, a4, b2, b4)
 
 # Normal/Axial Force v Angle of Attack
 ax3.set_xlabel('Alpha [deg]')
@@ -177,11 +182,23 @@ ax3.scatter(
     s=size,
     c='red'
 )
+ax3.scatter(
+    zeroVel.X,
+    zeroVel.NF,
+    s=size,
+    c='green'
+)
 ax3_2.scatter(
     flatPlateAng.X,
     flatPlateAng.AF,
     s=size,
     c='blue'
+)
+ax3_2.scatter(
+    zeroVel.X,
+    zeroVel.AF,
+    s=size,
+    c='black'
 )
 
 # Curve Fit Lines (Linear)
@@ -192,11 +209,25 @@ ax3.plot(
     label='Normal Force',
     linewidth=lnwidth
 )
+ax3.plot(
+    zeroVelXNF,
+    zeroVelYNF,
+    'g-',
+    label='Zero Velocity',
+    linewidth=lnwidth
+)
 ax3_2.plot(
     flatPlateAngXAF,
     flatPlateAngYAF,
     'b-',
     label='Axial Force',
+    linewidth=lnwidth
+)
+ax3_2.plot(
+    zeroVelXAF,
+    zeroVelYAF,
+    'k-',
+    label='Zero Velocity',
     linewidth=lnwidth
 )
 
@@ -309,6 +340,8 @@ ax2.legend()
 ax3.set_title('Normal/Axial Force vs Angle of Attack')
 ax3.set_xlim(xmin=0)
 ax3_2.set_xlim(xmin=0)
+ax3.legend()
+ax3_2.legend()
 ax4.set_title('Coefficient of Lift vs Angle of Attack')
 ax4.set_xlim(xmin=0)
 ax4_2.set_xlim(xmin=0)

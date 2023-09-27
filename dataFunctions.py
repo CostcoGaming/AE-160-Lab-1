@@ -151,6 +151,15 @@ def get_cubic_curve(x, y):
     
     return [x_line, y_line, a, b, c, d]
 
+def calibrate_curve(x, a1, a2, b1, b2):
+    a = a1 - a2
+    b = b1 - b2
+
+    x_line = np.arange(min(x), max(x))
+    y_line = a*x_line + b
+
+    return [x_line, y_line]
+
 def data_split(data:list):
     '''This function splits dataframe into: Alpha/Velocity, Normal Force,
     Axial Force, and Pitching Moment. Also converts forces into metric.'''
