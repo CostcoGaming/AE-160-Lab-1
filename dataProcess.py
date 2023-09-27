@@ -186,7 +186,7 @@ ax3.scatter(
     zeroVel.X,
     zeroVel.NF,
     s=size,
-    c='green'
+    c='black'
 )
 ax3_2.scatter(
     flatPlateAng.X,
@@ -212,7 +212,7 @@ ax3.plot(
 ax3.plot(
     zeroVelXNF,
     zeroVelYNF,
-    'g-',
+    'k-',
     label='Zero Velocity',
     linewidth=lnwidth
 )
