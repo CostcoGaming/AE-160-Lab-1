@@ -15,13 +15,14 @@ psf2pa = 0.020885 # Conversion factor for psf --> Pa
 # and confusing list formatting
 class Data:
     def __init__(self, alphaVel, normalForce, axialForce, pitchingMoment,
-                 coefficientLift, coefficientDrag):
+                 coefficientLift, coefficientDrag, coefficientMoment):
         self.X = alphaVel # Either AoA or v_inf
         self.NF = normalForce
         self.AF = axialForce
         self.PM = pitchingMoment
         self.CL = coefficientLift
         self.CD = coefficientDrag
+        self.CM = coefficientMoment
 
 def read_files(files:list[str]):
     '''This function reads .csv a list of files and turns it into a list of 
@@ -67,7 +68,7 @@ def force2coeff(force:list[int], q:list[int], S:int):
         
     return coefficient
 
-def moment2coeff(moment:list[int], q:list[int], S:list[int]):
+def moment2coeff(moment:list[int], q:list[int],S:int, d:int):
     '''This functions converts pitching moment into its corresponding pitching
     moment coefficient.'''
     
@@ -75,8 +76,13 @@ def moment2coeff(moment:list[int], q:list[int], S:list[int]):
     coefficient = [0]*n # Initializing list
     
     # Iterate through moments 
+    for i in range(0,n):
+        if q[i] == 0:
+            coefficient[i] = None
+        else:
+            coefficient [i] = moment[i]/(q[i]*S*d)
 
-    return
+    return coefficient
 
 def NA2LD(N:list[int], A:list[int], alphaDeg:list[int]):
     '''This function takes normal/axial force and angle of attack and converts
@@ -86,8 +92,8 @@ def NA2LD(N:list[int], A:list[int], alphaDeg:list[int]):
 
     # Initialize lists
     liftForce = [0]*n
-    dragForce = liftForce
-    alphaRad = liftForce
+    dragForce = [0]*n
+    alphaRad = [0]*n
 
     # Iterate through list to convert to lift force for corresponding
     # normal/axial forces + AoA.
@@ -172,6 +178,15 @@ def data_split(data:list):
         75.40, # Inverted Cup
         76.21  # Sphere
     ]
+    
+    S = [ # Values in mm^2
+        4396.68, # Flat Plate
+        4396.68, # Flat Plate
+        4396.68, # Flat Plate
+        13495.01, # Half Sphere
+        32996.84, # Inverted Cup
+        18246.26 # Sphere
+    ]
 
     B = [       # B Value in mm
         98.42,  # Flat Plate 
@@ -183,6 +198,7 @@ def data_split(data:list):
     ]
 
     diameters[:] = [x/1000 for x in diameters] # Convert to m
+    S[:] = [x/(1000**2) for x in S] # Convert to m^2
     B[:] = [x/1000 for x in B] # Convert to m
 
     lbf2N = 4.44822         # Conversion for lbf to N
@@ -205,8 +221,9 @@ def data_split(data:list):
         data[0]['NF/SF']*lbf2N,
         data[0]['AF/AF2']*lbf2N,
         data[0]['PM/YM']*inlbs2Nm,
-        force2coeff(lF0, data[0]['q']/psf2pa, diameters[0]),
-        force2coeff(dF0, data[0]['q']/psf2pa, diameters[0])
+        force2coeff(lF0, data[0]['q']/psf2pa, S[0]),
+        force2coeff(dF0, data[0]['q']/psf2pa, S[0]),
+        moment2coeff(data[0]['PM/YM'], data[0]['q'], S[0], diameters[0])
     )
     
     list[0].PM = moment_transfer(list[0].PM, list[0].NF, B[0])
@@ -216,8 +233,9 @@ def data_split(data:list):
         data[1]['NF/SF']*lbf2N,
         data[1]['AF/AF2']*lbf2N,
         data[1]['PM/YM']*inlbs2Nm,
-        force2coeff(lF, data[1]['q']/psf2pa, diameters[1]),
-        force2coeff(dF, data[1]['q']/psf2pa, diameters[1])
+        force2coeff(lF, data[1]['q']/psf2pa, S[1]),
+        force2coeff(dF, data[1]['q']/psf2pa, S[1]),
+        moment2coeff(data[1]['PM/YM'], data[1]['q'], S[1], diameters[1])
     )
     
     list[1].PM = moment_transfer(list[1].PM, list[1].NF, B[1])
@@ -230,9 +248,10 @@ def data_split(data:list):
             data[i]['NF/SF']*lbf2N,    # Normal Force
             data[i]['AF/AF2']*lbf2N,   # Axial Force
             data[i]['PM/YM']*inlbs2Nm, # Pitching Moment
-            force2coeff(data[i]['NF/SF']*lbf2N, data[i]['q']/psf2pa, diameters[i]),
-            force2coeff(data[i]['AF/AF2']*lbf2N, data[i]['q']/psf2pa, diameters[i])
+            force2coeff(data[i]['NF/SF']*lbf2N, data[i]['q']/psf2pa, S[i]),
+            force2coeff(data[i]['AF/AF2']*lbf2N, data[i]['q']/psf2pa, S[i]),
+            moment2coeff(data[i]['PM/YM'], data[i]['q'], S[i], diameters[i])
         )   
         list[i].PM = moment_transfer(list[i].PM, list[i].NF, B[i])
 
-    return list
+    return list, lF, dF
