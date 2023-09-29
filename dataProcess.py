@@ -51,25 +51,25 @@ ax1.scatter(
     flatPlateVel.X,
     flatPlateVel.NF,
     c='blue',
-    s=size,
+    s=size
 )
 ax1.scatter(
     halfSphere.X,
     halfSphere.NF,
     c='green',
-    s=size,    
+    s=size    
 )
 ax1.scatter(
     invertedCup.X,
     invertedCup.NF,
     s=size,
-    c='red',
+    c='red'
 )
 ax1.scatter(
     sphere.X,
     sphere.NF,
     s=size,
-    c='black',
+    c='black'
 )
 
 # Curve Fit Lines (Linear)
@@ -169,17 +169,22 @@ ax2.plot(
 
 flatPlateAngXNF, flatPlateAngYNF, a1, b1 = get_linear_curve(flatPlateAng.X, flatPlateAng.NF)
 flatPlateAngXAF, flatPlateAngYAF, a2, b2 = get_linear_curve(flatPlateAng.X, flatPlateAng.AF)
-zeroVelXNF, zeroVelYNF, a3, b3 = get_linear_curve(zeroVel.X, zeroVel.NF)
-zeroVelXAF, zeroVelYAF, a4, b4 = get_linear_curve(zeroVel.X, zeroVel.AF)
+flatPlateAngXPM, flatPlateAngYPM, a3, b3 = get_linear_curve(flatPlateAng.X, flatPlateAng.PM)
+zeroVelXNF, zeroVelYNF, a4, b4 = get_linear_curve(zeroVel.X, zeroVel.NF)
+zeroVelXAF, zeroVelYAF, a5, b5 = get_linear_curve(zeroVel.X, zeroVel.AF)
+zeroVelXPM, zeroVelYPM, a6, b6 = get_linear_curve(zeroVel.X, zeroVel.PM)
 
-flatPlateAngXNF, flatPlateAngYNF = calibrate_curve(flatPlateAng.X, a1, a3, b1, b3)
-flatPlateAngXAF, flatPlateAngYAF = calibrate_curve(flatPlateAng.X, a2, a4, b2, b4)
+flatPlateAngXNF, flatPlateAngYNF = calibrate_curve(flatPlateAng.X, a1, a4, b1, b4)
+flatPlateAngXAF, flatPlateAngYAF = calibrate_curve(flatPlateAng.X, a2, a5, b2, b5)
+flatPlateAndXPM, flatPlateAngYPM = calibrate_curve(flatPlateAng.X, a3, a6, b3, b6)
 
 # Normal/Axial Force v Angle of Attack
 ax3.set_xlabel('Alpha [deg]')
 ax3.set_ylabel('Normal Force [N]')
 ax3_2.set_xlabel('Alpha [deg]')
 ax3_2.set_ylabel('Axial Force [N]]')
+ax3_3.set_xlabel('Alpha [deg]')
+ax3_3.set_ylabel('Pitching Moment [N*m]')
 ax3.scatter(
     flatPlateAng.X,
     flatPlateAng.NF,
@@ -204,13 +209,25 @@ ax3_2.scatter(
     s=size,
     c='black'
 )
+ax3_3.scatter(
+    flatPlateAng.X,
+    flatPlateAng.PM,
+    s=size,
+    c='green'
+)
+ax3_3.scatter(
+    zeroVel.X,
+    zeroVel.PM,
+    s=size,
+    c='black'
+)
 
 # Curve Fit Lines (Linear)
 ax3.plot(
     flatPlateAngXNF,
     flatPlateAngYNF,
     'r-',
-    label='Normal Force',
+    label='Calibrated Normal Force',
     linewidth=lnwidth
 )
 ax3.plot(
@@ -224,12 +241,26 @@ ax3_2.plot(
     flatPlateAngXAF,
     flatPlateAngYAF,
     'b-',
-    label='Axial Force',
+    label='Calibrated Axial Force',
     linewidth=lnwidth
 )
 ax3_2.plot(
     zeroVelXAF,
     zeroVelYAF,
+    'k-',
+    label='Zero Velocity',
+    linewidth=lnwidth
+)
+ax3_3.plot(
+    flatPlateAngXPM,
+    flatPlateAngYPM,
+    'g-',
+    label='Calibrated Pitching Moment',
+    linewidth=lnwidth
+)
+ax3_3.plot(
+    zeroVelXPM,
+    zeroVelYPM,
     'k-',
     label='Zero Velocity',
     linewidth=lnwidth
@@ -493,10 +524,13 @@ ax2.grid()
 ax3.set_title('Force/Moment vs Angle of Attack')
 ax3.set_xlim(xmin=0)
 ax3.grid()
+ax3.legend()
 ax3_2.set_xlim(xmin=0)
 ax3_2.grid()
+ax3_2.legend()
 ax3_3.set_xlim(xmin=0)
 ax3_3.grid()
+ax3_3.legend()
 ax4.set_title('Coefficients vs Angle of Attack')
 ax4.set_xlim(xmin=0)
 ax4.grid()
@@ -523,7 +557,7 @@ ax8.set_xlim(xmin=0)
 ax8.set_ylim(ymin=-200, ymax=200)
 ax8.legend()
 ax8.grid()
-ax9.set_title('Lift/Drag Forces vs Alpha')
+ax9.set_title('Lift/Drag Forces vs Angle of Attack')
 ax9.set_xlim(xmin=0)
 ax9.grid()
 ax9_2.set_xlim(xmin=0)
