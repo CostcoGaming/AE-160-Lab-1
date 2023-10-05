@@ -180,12 +180,12 @@ def data_split(data:list):
     ]
     
     S = [ # Values in mm^2
-        4396.68, # Flat Plate
-        4396.68, # Flat Plate
-        4396.68, # Flat Plate
-        13495.01, # Half Sphere
-        32996.84, # Inverted Cup
-        18246.26 # Sphere
+        5598.03, # Flat Plate
+        5598.03, # Flat Plate
+        5598.03, # Flat Plate
+        4465.11, # Half Sphere
+        4465.11, # Inverted Cup
+        4561.56 # Sphere
     ]
 
     B = [       # B Value in mm
