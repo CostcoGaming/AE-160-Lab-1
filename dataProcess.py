@@ -36,8 +36,8 @@ fig9, [ax9, ax9_2] = plt.subplots(2) # Lift/Drag v Angle of Attack
 # Parameters
 wl = 151 # Window Length
 po = 2   # Polynomial Order
-size = 0.5
-lnwidth = 2
+size = 0.25
+lnwidth = 3
 
 flatPlateVelXNF, flatPlateVelYNF, _, _ = get_linear_curve(flatPlateVel.X, flatPlateVel.NF)
 halfSphereXNF, halfSphereYNF, _, _ = get_linear_curve(halfSphere.X, halfSphere.NF)
@@ -235,7 +235,7 @@ ax3.plot(
     zeroVelYNF,
     'k-',
     label='Zero Velocity',
-    linewidth=lnwidth
+    linewidth=lnwidth-1
 )
 ax3_2.plot(
     flatPlateAngXAF,
@@ -249,7 +249,7 @@ ax3_2.plot(
     zeroVelYAF,
     'k-',
     label='Zero Velocity',
-    linewidth=lnwidth
+    linewidth=lnwidth-1
 )
 ax3_3.plot(
     flatPlateAngXPM,
@@ -263,7 +263,7 @@ ax3_3.plot(
     zeroVelYPM,
     'k-',
     label='Zero Velocity',
-    linewidth=lnwidth
+    linewidth=lnwidth-1
 )
 
 flatPlateAngXCL, flatPlateAngYCL, _, _= get_linear_curve(flatPlateAng.X, flatPlateAng.CL)
@@ -481,7 +481,6 @@ flatPlateAngXLF, flatPlateAngYLF, _, _ = get_linear_curve(flatPlateAng.X, lift)
 flatPlateAngXDF, flatPlateAngYDF, _, _ = get_linear_curve(flatPlateAng.X, drag)
 
 # Lift/Drag Forces v Angle of Attack
-ax9.set_xlabel('Alpha [deg]')
 ax9.set_ylabel('Lift Force [N]')
 ax9_2.set_xlabel('Alpha [deg]')
 ax9_2.set_ylabel('Drag Force [N]')
@@ -514,52 +513,52 @@ ax9_2.plot(
 
 # Graph formating
 ax1.set_title('Normal Force vs Free Stream Velocity')
-ax1.set_xlim(xmin=0)
+ax1.set_xlim(xmin=0, xmax=42)
 ax1.legend()
 ax1.grid()
 ax2.set_title('Axial Force vs Free Stream Velocity')
-ax2.set_xlim(xmin=0)
+ax2.set_xlim(xmin=0, xmax=42)
 ax2.legend()
 ax2.grid()
 ax3.set_title('Force/Moment vs Angle of Attack')
-ax3.set_xlim(xmin=0)
+ax3.set_xlim(xmin=0, xmax=23)
 ax3.grid()
 ax3.legend()
-ax3_2.set_xlim(xmin=0)
+ax3_2.set_xlim(xmin=0, xmax=23)
 ax3_2.grid()
 ax3_2.legend()
-ax3_3.set_xlim(xmin=0)
+ax3_3.set_xlim(xmin=0, xmax=23)
 ax3_3.grid()
 ax3_3.legend()
 ax4.set_title('Coefficients vs Angle of Attack')
-ax4.set_xlim(xmin=0)
+ax4.set_xlim(xmin=0, xmax=23)
 ax4.grid()
-ax4_2.set_xlim(xmin=0)
+ax4_2.set_xlim(xmin=0, xmax=23)
 ax4_2.grid()
-ax4_3.set_xlim(xmin=0)
+ax4_3.set_xlim(xmin=0, xmax=23)
 ax4_3.grid()
 ax5.set_title('Pitching Moment vs Free Stream Velocity')
-ax5.set_xlim(xmin=0)
+ax5.set_xlim(xmin=0, xmax=42)
 ax5.grid()
 ax5.legend()
 ax6.set_title('Coefficient of Lift vs Free Stream Velocity')
-ax6.set_xlim(xmin=0)
+ax6.set_xlim(xmin=0, xmax=42)
 ax6.set_ylim(ymin=-0.3, ymax=0.3)
 ax6.legend()
 ax6.grid()
 ax7.set_title('Coefficient of Drag vs Free Stream Velocity')
-ax7.set_xlim(xmin=0)
-ax7.set_ylim(ymin=-0.02, ymax=0.3)
+ax7.set_xlim(xmin=0, xmax=42)
+ax7.set_ylim(ymin=-0.02, ymax=1.5)
 ax7.legend()
 ax7.grid()
 ax8.set_title('Coefficient of Pitching Moment vs Free Stream Velocity')
-ax8.set_xlim(xmin=0)
-ax8.set_ylim(ymin=-200, ymax=200)
+ax8.set_xlim(xmin=0, xmax=42)
+ax8.set_ylim(ymin=-200, ymax=100)
 ax8.legend()
 ax8.grid()
 ax9.set_title('Lift/Drag Forces vs Angle of Attack')
-ax9.set_xlim(xmin=0)
+ax9.set_xlim(xmin=0, xmax=23)
 ax9.grid()
-ax9_2.set_xlim(xmin=0)
+ax9_2.set_xlim(xmin=0, xmax=23)
 ax9_2.grid()
 plt.show()
